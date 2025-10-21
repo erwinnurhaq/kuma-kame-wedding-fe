@@ -1,0 +1,444 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  height: 100%;
+}
+body {
+  overflow-x: hidden;
+  font-family: 'Playfair Display', serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  position: relative;
+}
+img {
+  display: block;
+}
+
+.no-scroll {
+  position: fixed;
+  overflow-y: scroll; /* Forces the scrollbar to be visible */
+  width: 100%; /* Ensures the body maintains its full width */
+}
+
+#main-intro {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#main-intro[hidden] {
+  transform: translate(0, -150%);
+  transition: all 1s ease-in-out;
+  visibility: hidden;
+  user-select: none;
+  pointer-events: none;
+}
+
+#main-bg {
+  position: fixed;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+}
+#main-bg::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3.125rem;
+  width: 100%;
+  background-color: white;
+}
+#main-bg::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 3.125rem;
+  width: 100%;
+  background-color: white;
+}
+#main-bg .content {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  inset: 0;
+  z-index: -1;
+}
+#main-bg .main-bg-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  inset: 0;
+  z-index: -1;
+}
+#main-bg img[alt='bg-intro'] {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+#main-bg img[alt^='bg-plant']{
+  position: absolute;
+  bottom: 3.125rem;
+  width: 17%;
+  max-width: 320px;
+  min-width: 150px;
+  height: auto;
+  transform-origin: bottom center;
+  animation: plant-sway 6s ease-in-out infinite;
+  will-change: transform;
+}
+#main-bg img[alt='bg-plant1'] {
+  left: 0;
+  animation-duration: 6.5s;
+  animation-delay: -1s;
+}
+#main-bg img[alt='bg-plant2'] {
+  left: 7.5%;
+  animation-duration: 7.2s;
+  animation-delay: -3s;
+}
+#main-bg img[alt='bg-plant3'] {
+  right: 7.5%;
+  animation-duration: 6.8s;
+  animation-delay: -2s;
+}
+#main-bg img[alt='bg-plant4'] {
+  right: 0;
+  animation-duration: 7.5s;
+  animation-delay: -4s;
+}
+
+@keyframes plant-sway {
+  0%   { transform: rotate(0deg) translateX(0); }
+  25%  { transform: rotate(3deg) translateX(2px); }
+  50%  { transform: rotate(0deg) translateX(0); }
+  75%  { transform: rotate(-3deg) translateX(-2px); }
+  100% { transform: rotate(0deg) translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #main-bg img[alt^='bg-plant'] {
+    animation: none;
+  }
+}
+
+#bird-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  pointer-events: none;
+  user-select: none;
+  z-index: -1;
+}
+
+.full-screen {
+  display: block;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: auto;
+}
+
+.action-btn {
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  padding: 1rem;
+  border: 1px solid black;
+  background-color: transparent;
+  color: black;
+  cursor: pointer;
+  transition: background-color 0.1s ease-in-out;
+}
+.action-btn:hover,
+.action-btn.active {
+  background-color: #adbed8;
+  color: white;
+}
+
+#intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+#intro .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+#intro .content {
+  width: 100%;
+  max-width: 800px;
+  padding: 1rem;
+  text-align: center;
+  margin-top: -120px;
+}
+#intro h1 {
+  font-size: 4rem;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 1.5rem;
+}
+#intro p[data-date] {
+  font-weight: bold;
+}
+#intro .quote {
+  margin-top: 1rem;
+  font-style: italic;
+}
+#intro .couple-img {
+  position: absolute;
+  z-index: -1;
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 0);
+  width: 100%;
+  max-width: 600px;
+}
+#intro .couple-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+#panels #panels-container {
+  height: 100vh;
+  display: flex;
+  flex-wrap: nowrap;
+  padding: 0;
+  overflow: hidden;
+  /* background-color: white; */
+}
+#panels #panels-container .panel {
+  position: relative;
+  min-width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  color: #333;
+  text-align: left;
+  /* border-right: 1px solid #f00; */
+}
+
+#surah-quote {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#surah-quote .content {
+  padding: 2rem;
+  max-width: 756px;
+}
+#surah-quote h2 {
+  text-align: left;
+  padding-top: 1rem;
+  font-weight: normal;
+}
+
+#groom-bride {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5rem;
+}
+#groom-bride .picture {
+  width: 200px;
+  height: 200px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+#groom-bride .picture img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+#groom-bride h1 {
+  text-transform: uppercase;
+  font-size: 1.25rem;
+  font-weight: normal;
+}
+#groom-bride h2 {
+  text-transform: uppercase;
+  font-size: 2rem;
+  max-width: 15rem;
+  margin-bottom: 1rem;
+}
+#groom-bride h3 {
+  margin-bottom: 1rem;
+  font-weight: normal;
+  font-style: italic;
+}
+
+#time-loc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#time-loc .content {
+  width: 100%;
+  max-width: 756px;
+  padding: 2rem;
+}
+#time-loc .title {
+  text-transform: uppercase;
+  font-size: 1.25rem;
+  font-weight: normal;
+  margin-bottom: 1rem;
+}
+#time-loc .time {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+#time-loc .location-name {
+  font-size: 2rem;
+  font-weight: normal;
+  margin-bottom: 0.4rem;
+}
+#time-loc .map-btn {
+  float: right;
+  margin-top: 1rem;
+}
+
+#countdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+#countdown h1 {
+  text-transform: uppercase;
+  font-size: 1.25rem;
+  font-weight: normal;
+}
+#countdown .countdown-time p {
+  font-size: 2rem;
+}
+#countdown .countdown-time p span {
+  font-size: 5rem;
+  font-weight: bold;
+}
+#countdown #save-date-btn {
+  float: right;
+}
+
+#reservation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin-top: -3.125rem;
+  background-color: white;
+}
+#reservation .content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  padding: 3.125rem;
+}
+#reservation h1 {
+  text-transform: uppercase;
+  font-size: 1.25rem;
+  font-weight: normal;
+  margin-bottom: 1rem;
+}
+#reservation h2 {
+  font-size: 2rem;
+}
+
+#ending {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#ending .content {
+  text-align: center;
+  max-width: 756px;
+}
+#ending h1 {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+}
+#ending h2 {
+  font-size: 2rem;
+  font-weight: normal;
+  margin-bottom: 1.5rem;
+}
+#ending h3 {
+  font-weight: normal;
+}
+
+/* CAT */
+canvas.cat-canvas {
+  position: absolute;
+  bottom: 16px;
+  right: 0;
+  width: calc(550px / 2);
+  height: calc(380px / 2);
+}
+
+/* FORM */
+#attendance-form label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+#attendance-form input[type='text'],
+#attendance-form input[type='number'],
+#attendance-form textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid black;
+  margin-bottom: 20px;
+  font-size: 14px;
+  background-color: #fff;
+}
+#attendance-form .attendance {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+#attendance-form .attendance button {
+  flex: 1;
+  padding: 10px 0;
+}
+#attendance-form button.submit-btn {
+  background-color: black;
+  color: #fff;
+  border: none;
+  padding: 10px 25px;
+  cursor: pointer;
+  font-size: 14px;
+}

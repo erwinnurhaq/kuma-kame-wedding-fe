@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@0.5.24/dist/vanta.birds.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollToPlugin.min.js"></script>
+    <title>Wedding Invitation</title>
+  </head>
+  <body class="no-scroll">
+    <main>
+      <div id="main-bg">
+        <div class="content">
+          <div class="main-bg-wrapper">
+            <img src="/images/bg-intro.jpg" alt="bg-intro" />
+            <img src="/images/bg-plant1.png" alt="bg-plant1" />
+            <img src="/images/bg-plant2.png" alt="bg-plant2" />
+            <img src="/images/bg-plant3.png" alt="bg-plant3" />
+            <img src="/images/bg-plant4.png" alt="bg-plant4" />
+          </div>
+        </div>
+      </div>
+      <section id="intro" class="full-screen">
+        <div id="bird-canvas"></div>
+        <div class="container full-screen">
+          <div class="content">
+            <div>
+              <p class="quote">
+                Glory be to Allah who has created humans in pairs.<br />By asking for the Grace and Ridho of Allah SWT,
+                we intend to invite you to our wedding.
+              </p>
+            </div>
+            <div>
+              <!-- <p>The Wedding Of</p> -->
+              <h1>GHINA & ERWIN</h1>
+              <p data-date></p>
+            </div>
+          </div>
+          <div class="couple-img">
+            <img src="/images/couple.png" alt="couple" />
+          </div>
+        </div>
+      </section>
+
+      <section id="panels">
+        <div id="panels-container" style="width: 400%">
+          <article id="surah-quote" class="panel full-screen">
+            <div class="container content">
+              <h1>
+                "And one of His signs is that He created for you spouses from among yourselves so that you may find
+                comfort in them. And He has placed between you compassion and mercy. Surely in this are signs for people
+                who reflect."
+              </h1>
+              <h2>(QS. Ar-rum) 30:21</h2>
+            </div>
+            <canvas class="cat-canvas" />
+          </article>
+          <article id="groom-bride" class="panel full-screen">
+            <div id="groom-bride__bride">
+              <h1>The Bride</h1>
+              <div class="picture">
+                <img src="/images/bride.jpg" alt="the-groom" />
+              </div>
+              <h2>Meldi Ghina Salsabila</h2>
+              <h3>Putri kedua dari</h3>
+              <h4>Moerindra Wahyudi Permana (Alm.) &<br />Imelda Dewi Haryanti</h4>
+            </div>
+            <div id="groom-bride__groom">
+              <h1>The Groom</h1>
+              <div class="picture">
+                <img src="/images/groom.jpg" alt="the-groom" />
+              </div>
+              <h2>Erwin Nurhaq</h2>
+              <h3>Putra kedua dari</h3>
+              <h4>Ma'mur Supriyadi (Alm.) &<br />Nenden Dewi Nurhayati (Alm.)</h4>
+            </div>
+            <canvas class="cat-canvas" />
+          </article>
+          <article id="time-loc" class="panel full-screen">
+            <div class="content">
+              <p class="title">Wedding Ceremony and Reception</p>
+              <p class="time"><span data-date></span><br /><span data-time></span></p>
+              <p>at</p>
+              <p class="location-name">Sepiring Nusantara</p>
+              <p>
+                Jl. Raya Karadenan Jl. Raya Sukahati No.88, RT.03/RW.10, Karadenan, Kec. Cibinong, Kabupaten Bogor, Jawa
+                Barat 16913
+              </p>
+              <a href="https://maps.app.goo.gl/oCTHZ8m5sz6kYx6A6" target="_blank" class="action-btn map-btn">Maps</a>
+            </div>
+            <canvas class="cat-canvas" />
+          </article>
+          <article id="countdown" class="panel full-screen">
+            <div class="content">
+              <h1>Almost Time for Our Celebration!</h1>
+              <div class="countdown-time">
+                <p><span id="countdown-d">00</span>D</p>
+                <p><span id="countdown-h">00</span>H</p>
+                <p><span id="countdown-m">00</span>M</p>
+                <p><span id="countdown-s">00</span>S</p>
+              </div>
+              <a
+                href="https://www.google.com/calendar/render?action=TEMPLATE&text=The%20Wedding%20of%20Ghina%20%26%20Erwin&dates=20260207T090000/20260207T120000&location=Sepiring%20Nusantara%2C%20Jl.%20Raya%20Karadenan%20Jl.%20Raya%20Sukahati%20No.88%2C%20RT.03%2FRW.10%2C%20Karadenan%2C%20Kec.%20Cibinong%2C%20Kabupaten%20Bogor%2C%20Jawa%20Barat%2016913%2C%20Indonesia"
+                target="_blank"
+                id="save-date-btn"
+                class="action-btn"
+                >Save The Date!</a
+              >
+            </div>
+            <canvas class="cat-canvas" />
+          </article>
+        </div>
+      </section>
+
+      <section id="reservation">
+        <div class="container content">
+          <div>
+            <h1>Reservation</h1>
+            <h2>We kindly request your prompt response to confirm your attendance at our upcoming event.</h2>
+          </div>
+          <form id="attendance-form">
+            <label for="attd_name">Name</label>
+            <input type="text" id="attd_name" name="name" placeholder="Guest Name" required />
+
+            <label>Attendance</label>
+            <div class="attendance">
+              <button type="button" class="action-btn" id="attd_attendance_yes" value="yes">Attending</button>
+              <button type="button" class="action-btn" id="attd_attendance_no" value="no">Not Attending</button>
+              <button type="button" class="action-btn" id="attd_attendance_maybe" value="maybe">Maybe</button>
+            </div>
+            <input type="hidden" id="attd_attendance" name="attendance" value="no" />
+
+            <label for="attd_guests">Number of Guests</label>
+            <input type="number" id="attd_guests" name="guests" min="1" max="15" value="1" required />
+
+            <label for="attd_message">Message/Wishes</label>
+            <textarea id="attd_message" name="message" rows="5"></textarea>
+
+            <button type="submit" class="submit-btn">SUBMIT</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="ending" class="full-screen">
+        <div class="container content">
+          <h1>THANK YOU!</h1>
+          <h2>It is a pleasure and honor for us, if you are willing to attend and give us your blessing.</h2>
+          <h3>GHINA & ERWIN</h3>
+        </div>
+      </section>
+    </main>
+
+    <div id="main-intro">
+      <div id="main-loading">
+        <p>Loading... (<span id="main-loading-percentage">0</span>)</p>
+      </div>
+      <button type="button" id="main-intro-enter-btn" hidden>Enter</button>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
