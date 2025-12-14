@@ -27,24 +27,97 @@ img {
   width: 100%; /* Ensures the body maintains its full width */
 }
 
+.content {
+  will-change: transform, opacity;
+}
+
 #main-intro {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
+  height: 100vh;
+  height: 100dvh;
   background: white;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
 }
-#main-intro[hidden] {
-  transform: translate(0, -150%);
-  transition: all 1s ease-in-out;
-  visibility: hidden;
-  user-select: none;
+#main-intro-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+}
+#main-intro .main-intro-bg-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  inset: 0;
+  z-index: -1;
+}
+#main-intro img[alt='bg-intro-overlay'] {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+#main-intro .main-intro-texts {
+  text-align: center;
+  height: 100%;
+  padding: 8rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+#main-intro .main-intro-texts > div:nth-child(1) > h1 {
+  font-size: 3rem;
+  margin: 0.5rem 0 1rem 0;
+}
+#main-intro .main-intro-texts > div:nth-child(1) > p:nth-child(1) {
+  font-size: 1.75rem;
+}
+#main-intro .main-intro-texts > div:nth-child(2) > h2 {
+  font-size: 1.75rem;
+  margin: 0.5rem 0 1rem 0;
+}
+#main-intro .main-intro-texts > div:nth-child(2) > h5 {
+  font-size: 0.875rem;
+  font-weight: normal;
+  font-style: italic;
+}
+#main-intro-enter-btn {
+  width: 100%;
+  height: 3rem;
+  margin-top: 5rem;
+  outline: none;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+#main-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  opacity: 1;
+  transition: all 0.5s ease-in-out;
+}
+#main-loading[hidden] {
+  top: -100%;
+  opacity: 0;
   pointer-events: none;
+  user-select: none;
 }
 
 #main-bg {
@@ -54,6 +127,7 @@ img {
   left: 0;
   width: 100%;
   height: 100vh;
+  height: 100dvh;
 }
 #main-bg::after {
   content: '';
@@ -77,6 +151,7 @@ img {
   position: relative;
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   inset: 0;
   z-index: -1;
 }
@@ -93,7 +168,7 @@ img {
   object-fit: cover;
   object-position: center;
 }
-#main-bg img[alt^='bg-plant']{
+#main-bg img[alt^='bg-plant'] {
   position: absolute;
   bottom: 3.125rem;
   width: 17%;
@@ -126,11 +201,21 @@ img {
 }
 
 @keyframes plant-sway {
-  0%   { transform: rotate(0deg) translateX(0); }
-  25%  { transform: rotate(3deg) translateX(2px); }
-  50%  { transform: rotate(0deg) translateX(0); }
-  75%  { transform: rotate(-3deg) translateX(-2px); }
-  100% { transform: rotate(0deg) translateX(0); }
+  0% {
+    transform: rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: rotate(3deg) translateX(2px);
+  }
+  50% {
+    transform: rotate(0deg) translateX(0);
+  }
+  75% {
+    transform: rotate(-3deg) translateX(-2px);
+  }
+  100% {
+    transform: rotate(0deg) translateX(0);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -145,6 +230,7 @@ img {
   left: 0;
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   pointer-events: none;
   user-select: none;
   z-index: -1;
@@ -154,6 +240,7 @@ img {
   display: block;
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
 }
 
@@ -211,7 +298,6 @@ img {
   font-weight: bold;
 }
 #intro .quote {
-  margin-top: 1rem;
   font-style: italic;
 }
 #intro .couple-img {
@@ -229,22 +315,32 @@ img {
   object-fit: contain;
 }
 
-#panels #panels-container {
+#panels {
+  min-width: 100vw;
+  min-width: 100dvw;
   height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+#panels #panels-container {
+  height: 100%;
   display: flex;
   flex-wrap: nowrap;
   padding: 0;
-  overflow: hidden;
+  will-change: transform;
   /* background-color: white; */
 }
 #panels #panels-container .panel {
   position: relative;
   min-width: 100vw;
+  min-width: 100dvw;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   display: flex;
   color: #333;
   text-align: left;
+  will-change: transform;
   /* border-right: 1px solid #f00; */
 }
 
@@ -256,7 +352,8 @@ img {
 }
 #surah-quote .content {
   padding: 2rem;
-  max-width: 756px;
+  width: 100%;
+  max-width: 765px;
 }
 #surah-quote h2 {
   text-align: left;
@@ -269,6 +366,11 @@ img {
   align-items: center;
   justify-content: center;
   gap: 5rem;
+  min-width: 1024px;
+}
+#groom-bride__bride,
+#groom-bride__groom {
+  will-change: transform, opacity;
 }
 #groom-bride .picture {
   width: 200px;
@@ -441,4 +543,280 @@ canvas.cat-canvas {
   padding: 10px 25px;
   cursor: pointer;
   font-size: 14px;
+}
+
+@media screen and (max-width: 1439px) {
+  #main-intro .main-intro-texts {
+    padding: 7rem 2rem;
+  }
+
+  #surah-quote h1 {
+    font-size: 1.75rem;
+  }
+  #surah-quote h2 {
+    font-size: 1.25rem;
+  }
+
+  canvas.cat-canvas {
+    bottom: 20px;
+    width: calc(550px / 2.25);
+    height: calc(380px / 2.25);
+  }
+}
+
+@media screen and (max-width: 1279px) {
+  #main-intro .main-intro-texts {
+    padding: 6rem 2rem;
+  }
+  #intro h1 {
+    font-size: 3.5rem;
+    padding: 1.25rem;
+  }
+  #intro .quote {
+    font-size: 0.875rem;
+  }
+  #intro .couple-img {
+    max-width: 500px;
+  }
+
+  #surah-quote .content {
+    padding: 7.5%;
+  }
+  #surah-quote h1 {
+    font-size: 1.5rem;
+  }
+  #surah-quote h2 {
+    font-size: 1.125rem;
+  }
+
+  canvas.cat-canvas {
+    bottom: 24px;
+    width: calc(550px / 2.5);
+    height: calc(380px / 2.5);
+  }
+}
+
+@media screen and (max-width: 1023px) {
+  #main-bg img[alt='bg-plant1'] {
+    left: -2.5%;
+  }
+  #main-bg img[alt='bg-plant2'] {
+    left: 2.5%;
+  }
+  #main-bg img[alt='bg-plant3'] {
+    right: 2.5%;
+  }
+  #main-bg img[alt='bg-plant4'] {
+    right: -2.5%;
+  }
+
+  #main-intro .main-intro-texts {
+    padding: 5rem 2rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(1) > h1 {
+    font-size: 2.5rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(1) > p:nth-child(1) {
+    font-size: 1.5rem;
+  }
+
+  #intro h1 {
+    font-size: 3rem;
+  }
+  #intro .quote {
+    font-size: 0.8rem;
+  }
+
+  #surah-quote .content {
+    padding: 12.5%;
+  }
+  #surah-quote h1 {
+    font-size: 1.25rem;
+  }
+  #surah-quote h2 {
+    font-size: 1rem;
+  }
+
+    canvas.cat-canvas {
+    bottom: 28px;
+    width: calc(550px / 3);
+    height: calc(380px / 3);
+  }
+}
+
+@media screen and (max-width: 767px) {
+  #main-bg img[alt^='bg-plant'] {
+    min-width: 140px;
+  }
+  #main-bg img[alt='bg-plant1'] {
+    left: -7.5%;
+  }
+  #main-bg img[alt='bg-plant2'] {
+    left: 0;
+  }
+  #main-bg img[alt='bg-plant3'] {
+    right: 0;
+  }
+  #main-bg img[alt='bg-plant4'] {
+    right: -7.5%;
+  }
+
+  #main-intro .main-intro-texts {
+    padding: 4rem 2rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(1) > h1 {
+    font-size: 2rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(1) > p:nth-child(1) {
+    font-size: 1.25rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(2) > h2 {
+    font-size: 1.25rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(2) > h5 {
+    font-size: 0.75rem;
+  }
+  #main-intro-enter-btn {
+    margin-top: 3rem;
+  }
+
+  #intro h1 {
+    font-size: 2.75rem;
+  }
+
+  #reservation .content {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    padding: 2.5rem;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  #main-bg img[alt^='bg-plant'] {
+    min-width: 120px;
+  }
+  #main-bg img[alt='bg-plant1'] {
+    left: -12.5%;
+  }
+  #main-bg img[alt='bg-plant2'] {
+    left: -5%;
+  }
+  #main-bg img[alt='bg-plant3'] {
+    right: -5%;
+  }
+  #main-bg img[alt='bg-plant4'] {
+    right: -12.5%;
+  }
+
+  #intro h1 {
+    font-size: 2.25rem;
+  }
+  #intro .quote {
+    font-size: 0.75rem;
+    max-width: 24rem;
+    padding: 0 1rem;
+    margin: 0 auto;
+  }
+
+  #surah-quote .content {
+    padding: 17.5%;
+  }
+}
+
+@media screen and (max-width: 374px) {
+  #main-intro .main-intro-texts > div:nth-child(1) > h1 {
+    font-size: 1.75rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(1) > p:nth-child(1) {
+    font-size: 1.125rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(2) > h5 {
+    font-size: 0.675rem;
+  }
+
+  #intro h1 {
+    font-size: 1.75rem;
+  }
+  #intro .quote {
+    font-size: 0.7rem;
+    padding: 0 1.4rem;
+  }
+  #intro p[data-date] {
+    font-size: 0.875rem;
+  }
+}
+
+@media screen and (max-height: 1439px) {
+}
+
+@media screen and (max-height: 1279px) {
+}
+
+@media screen and (max-height: 1023px) {
+}
+
+@media screen and (max-height: 767px) {
+  #main-intro .main-intro-texts {
+    padding: 4rem 2rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(1) > h1 {
+    font-size: 2rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(1) > p:nth-child(1) {
+    font-size: 1.25rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(2) > h2 {
+    font-size: 1.25rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(2) > h5 {
+    font-size: 0.75rem;
+  }
+  #main-intro-enter-btn {
+    margin-top: 3rem;
+  }
+}
+
+@media screen and (max-height: 576px) {
+  #main-intro .main-intro-texts {
+    padding: 2.75rem;
+  }
+  #main-intro-enter-btn {
+    margin-top: 1.25rem;
+  }
+
+  #intro .content {
+    margin-top: -100px;
+  }
+  #intro h1 {
+    font-size: 2.25rem;
+    padding: 1rem;
+  }
+  #intro .quote {
+    font-size: 0.75rem;
+    max-width: 100%;
+    padding: 0 1rem;
+    margin: 0 auto;
+  }
+  #intro .couple-img {
+    max-width: 80vh;
+  }
+}
+
+@media screen and (max-height: 374px) {
+  #main-intro .main-intro-texts {
+    padding: 1.5rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(1) > h1 {
+    font-size: 1.75rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(1) > p:nth-child(1) {
+    font-size: 1.125rem;
+  }
+  #main-intro .main-intro-texts > div:nth-child(2) > h5 {
+    font-size: 0.675rem;
+  }
+
+  #intro .content {
+    margin-top: -100px;
+  }
 }

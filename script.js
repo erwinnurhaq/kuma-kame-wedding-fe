@@ -6,35 +6,15 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------------------------
      Lib Initialization
   --------------------------- */
-  const dpi = window.devicePixelRatio || 1;
+  const DPI = Math.min(window.devicePixelRatio || 1, 2);
   gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-  VANTA.BIRDS({
-    el: '#bird-canvas',
-    mouseControls: false,
-    touchControls: false,
-    gyroControls: false,
-    minHeight: 400.0,
-    minWidth: 400.0,
-    scale: 1.0,
-    scaleMobile: 1.0,
-    backgroundColor: 0xffffff,
-    color1: 0x747474,
-    color2: 0xd4d4d4,
-    colorMode: 'lerp',
-    birdSize: 0.7,
-    speedLimit: 3.0,
-    separation: 81.0,
-    alignment: 19.0,
-    cohesion: 19.0,
-    quantity: 2.0,
-    backgroundAlpha: 0.0,
-  });
+  document.body.classList.add('no-scroll');
 
   /* ---------------------------
      Event Date & Time Formatting
   --------------------------- */
-  const eventStartDate = new Date(2026, 1, 7, 9, 0, 0);
-  const eventEndDate = new Date(2026, 1, 7, 12, 0, 0);
+  const EVENT_START_DATE = new Date(2026, 1, 7, 9, 0, 0);
+  const EVENT_END_DATE = new Date(2026, 1, 7, 12, 0, 0);
 
   const dateFormat = new Intl.DateTimeFormat('en-GB', {
     weekday: 'long',
@@ -49,45 +29,200 @@ document.addEventListener('DOMContentLoaded', () => {
     hour12: true,
   });
 
-  function formatDate(date) {
-    const parts = dateFormat.format(date).split(' ');
-    return `${parts[0]} ${parts.slice(1).join(' ')}`;
-  }
-
   function updateDateTimeElements() {
-    const formattedDate = formatDate(eventStartDate);
-    const formattedTimeRange = `${timeFormat.format(eventStartDate)} - ${timeFormat.format(eventEndDate)}`;
+    const parts = dateFormat.format(EVENT_START_DATE).split(' ');
+    const formattedDate = `${parts[0]} ${parts.slice(1).join(' ')}`;
+    const formattedTimeRange = `${timeFormat.format(EVENT_START_DATE)} - ${timeFormat.format(EVENT_END_DATE)}`;
     document.querySelectorAll('[data-date]').forEach((el) => (el.textContent = formattedDate));
     document.querySelectorAll('[data-time]').forEach((el) => (el.textContent = formattedTimeRange));
   }
 
-  updateDateTimeElements();
+  /* ---------------------------
+     Assets
+  --------------------------- */
+
+  const MAIN_IMAGES_PATHS = [
+    `/images/bg-intro-overlay.webp`,
+    `/images/bg-intro.jpg`,
+    `/images/bg-plant1.png`,
+    `/images/bg-plant2.png`,
+    `/images/bg-plant3.png`,
+    `/images/bg-plant4.png`,
+    `/images/bride.jpg`,
+    `/images/groom.jpg`,
+    `/images/couple.png`,
+  ];
+  const CAT_FRAME_COUNT = 10;
+  const CAT_IMAGES_PATHS = Array.from(
+    { length: CAT_FRAME_COUNT },
+    (_, i) => `/images/cat_walking_frames_transparent_bg/frame_${String(i + 1).padStart(4, '0')}.png`
+  );
+  const TOTAL_IMAGES = MAIN_IMAGES_PATHS.length + CAT_IMAGES_PATHS.length;
+  const CAT_IMAGES = [];
+
+  let loaded = 0;
+
+  function preloadImages(src, total, onProgress) {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        loaded++;
+        onProgress(loaded / total);
+        resolve(img);
+      };
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
 
   /* ---------------------------
-     GSAP Animation
+     Intro Elements
   --------------------------- */
-  function setupHorizontalScrollPanels() {
-    const container = document.querySelector('#panels-container');
-    const panels = gsap.utils.toArray('.panel');
 
-    const horizontalTween = gsap.to(panels, {
-      x: () => -1 * (container.scrollWidth - innerWidth),
+  const mainIntro = document.querySelector('#main-intro');
+  const mainIntroEnterBtn = document.querySelector('#main-intro-enter-btn');
+  const mainLoading = document.querySelector('#main-loading');
+  const mainLoadingPercentage = document.querySelector('#main-loading-percentage');
+
+  function handleLoadingProgress(percentage) {
+    mainLoadingPercentage.textContent = Math.floor(percentage * 100) + '%';
+  }
+
+  async function preloadAllAssets() {
+    const mapper = (src) => preloadImages(src, TOTAL_IMAGES, handleLoadingProgress);
+    await Promise.all(MAIN_IMAGES_PATHS.map(mapper));
+    const cats = await Promise.all(CAT_IMAGES_PATHS.map(mapper));
+    CAT_IMAGES.push(...cats);
+  }
+
+  function handleMainIntroEnter() {
+    document.body.classList.remove('no-scroll');
+    gsap.to(mainIntro, {
+      y: `-100%`,
+      duration: 0.8,
+      onComplete: setupAfterIntro,
+    });
+  }
+
+  /* ---------------------------
+     Horizontal Scroll
+  --------------------------- */
+  function setupHorizontalScroll(onScrollUpdateCb) {
+    const panelSection = document.querySelector('#panels');
+    const panelContainer = document.querySelector('#panels-container');
+    const scrollDistance = panelSection.scrollWidth - innerWidth;
+
+    const horizontalTween = gsap.to(panelContainer, {
+      x: -scrollDistance,
       ease: 'none',
       scrollTrigger: {
-        trigger: container,
+        trigger: panelSection,
         pin: true,
         start: 'top top',
         scrub: 1,
-        end: () => `+=${container.scrollWidth - innerWidth}`,
+        end: () => `+=${scrollDistance}`,
+        onUpdate: onScrollUpdateCb,
+        invalidateOnRefresh: true,
       },
     });
 
-    return horizontalTween;
+    return { horizontalTween };
   }
 
-  function setupGSAPAnimation() {
-    const horizontalTween = setupHorizontalScrollPanels();
+  /* ---------------------------
+     Bird Animation
+  --------------------------- */
 
+  function setupBirdAnimation() {
+    VANTA.BIRDS({
+      el: '#bird-canvas',
+      mouseControls: false,
+      touchControls: false,
+      gyroControls: false,
+      minHeight: 400.0,
+      minWidth: 400.0,
+      scale: 1.0,
+      scaleMobile: 1.0,
+      backgroundColor: 0xffffff,
+      color1: 0x747474,
+      color2: 0xd4d4d4,
+      colorMode: 'lerp',
+      birdSize: 1,
+      speedLimit: 3.0,
+      separation: 81.0,
+      alignment: 19.0,
+      cohesion: 19.0,
+      quantity: 1.0,
+      backgroundAlpha: 0.0,
+    });
+  }
+
+  /* ---------------------------
+     Cat Animation
+  --------------------------- */
+
+  function setupCatAnimation() {
+    const canvasElements = document.querySelectorAll('.cat-canvas');
+    const canvases = Array.from(canvasElements).map((canvas) => {
+      const ctx = canvas.getContext('2d');
+      canvas.width = (550 / 2) * DPI;
+      canvas.height = (380 / 2) * DPI;
+      ctx.scale(DPI, DPI);
+      return { canvas, ctx };
+    });
+
+    let frameIndex = 0;
+    let lastScroll = 0;
+    let flipped = false;
+    let needsRender = false;
+    let targetDelta = 0;
+
+    function render() {
+      const frame = CAT_IMAGES[Math.floor(frameIndex) % CAT_FRAME_COUNT];
+      if (!frame?.complete || frame.naturalWidth === 0) return;
+
+      canvases.forEach(({ canvas, ctx }) => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+
+        if (flipped) {
+          ctx.translate(canvas.width / DPI, 0);
+          ctx.scale(-1, 1);
+        }
+
+        ctx.drawImage(frame, 0, 0, canvas.width / DPI, canvas.height / DPI);
+        ctx.restore();
+      });
+    }
+
+    function updateCatOnScroll(self) {
+      const scrollPos = self.scroll();
+      targetDelta = scrollPos - lastScroll;
+      flipped = targetDelta > 0;
+      lastScroll = scrollPos;
+      needsRender = true;
+    }
+
+    function rafLoop() {
+      if (needsRender) {
+        frameIndex = (frameIndex + Math.abs(targetDelta) * 0.05) % CAT_FRAME_COUNT;
+        render();
+        needsRender = false;
+      }
+      requestAnimationFrame(rafLoop);
+    }
+
+    render();
+    rafLoop();
+
+    return { updateCatOnScroll };
+  }
+
+  /* ---------------------------
+     Other Animation
+  --------------------------- */
+
+  function setupOtherAnimations(horizontalTween) {
     gsap.utils.toArray(['#surah-quote .content', '#reservation .content']).forEach((el) => {
       gsap.from(el, {
         opacity: 0,
@@ -121,90 +256,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     gsap.to(`#bird-canvas`, {
       autoAlpha: 0,
-      duration: 0.8,
+      duration: 0.4,
       ease: 'power2.out',
       scrollTrigger: {
         trigger: `#bird-canvas`,
         start: 'top+=25% top',
-        toggleActions: 'play reverse play reverse',
+        toggleActions: 'play none none reverse',
       },
     });
-  }
-
-  setupGSAPAnimation();
-
-  /* ---------------------------
-     Cat Animation
-  --------------------------- */
-  const CAT_FRAME_COUNT = 10;
-  const CAT_PATH = '/images/cat_walking_frames_transparent_bg/';
-  const catImages = [];
-
-  function getCatImagePaths() {
-    return new Array(CAT_FRAME_COUNT).fill('').map((_, i) => `${CAT_PATH}frame_${String(i + 1).padStart(4, '0')}.png`);
-  }
-
-  function initCatAnimation() {
-    const canvasElements = document.querySelectorAll('.cat-canvas');
-    const canvases = Array.from(canvasElements).map((canvas) => {
-      const ctx = canvas.getContext('2d');
-      canvas.width = (550 / 2) * dpi;
-      canvas.height = (380 / 2) * dpi;
-      ctx.scale(dpi, dpi);
-      return { canvas, ctx };
-    });
-
-    let frameIndex = 0;
-    let lastScroll = 0;
-    let flipped = false;
-
-    function render() {
-      const frame = catImages[Math.floor(frameIndex) % CAT_FRAME_COUNT];
-      if (!frame?.complete || frame.naturalWidth === 0) return;
-
-      canvases.forEach(({ canvas, ctx }) => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.save();
-
-        if (flipped) {
-          ctx.translate(canvas.width / dpi, 0);
-          ctx.scale(-1, 1);
-        }
-
-        ctx.drawImage(frame, 0, 0, canvas.width / dpi, canvas.height / dpi);
-        ctx.restore();
-      });
-    }
-
-    function handleScrollUpdate(self) {
-      const scrollPos = self.scroll();
-      const delta = scrollPos - lastScroll;
-      flipped = delta > 0;
-
-      if (Math.abs(delta) > 0) {
-        frameIndex = (frameIndex + Math.abs(delta) * 0.05) % CAT_FRAME_COUNT;
-        render();
-      }
-
-      lastScroll = scrollPos;
-    }
-
-    ScrollTrigger.create({
-      trigger: '#panels-container',
-      start: 'top top',
-      end: () => `+=${document.querySelector('#panels-container').scrollWidth - innerWidth}`,
-      scrub: 1,
-      ease: 'elastic',
-      onUpdate: handleScrollUpdate,
-    });
-
-    render();
   }
 
   /* ---------------------------
      Countdown
   --------------------------- */
-  const countdownTarget = eventStartDate.getTime();
+  const countdownTarget = EVENT_START_DATE.getTime();
   const countdownD = document.querySelector('#countdown-d');
   const countdownH = document.querySelector('#countdown-h');
   const countdownM = document.querySelector('#countdown-m');
@@ -239,95 +304,55 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(updateCountdownElements, nextTick + 6);
   }
 
-  updateCountdownElements();
-
   /* ---------------------------
      Reservation Form
   --------------------------- */
+
   const attendanceForm = document.querySelector('#attendance-form');
   const attendanceInput = document.querySelector('#attd_attendance');
   const attendanceButtons = attendanceForm.querySelectorAll('#attendance-form .attendance .action-btn');
 
-  attendanceButtons.forEach((button) => {
-    button.addEventListener('click', () => {
-      attendanceInput.value = button.value;
-      attendanceButtons.forEach((btn) => btn.classList.remove('active'));
-      button.classList.add('active');
+  function setupReservationForm() {
+    attendanceButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        attendanceInput.value = button.value;
+        attendanceButtons.forEach((btn) => btn.classList.remove('active'));
+        button.classList.add('active');
+      });
     });
-  });
 
-  attendanceForm.addEventListener('submit', (e) => {
-    e.preventDefault(); // remove this if you want normal form submit
-    console.log('Name:', attendanceForm.name.value);
-    console.log('Attendance:', attendanceForm.attendance.value);
-    console.log('Guests:', attendanceForm.guests.value);
-    console.log('Message:', attendanceForm.message.value);
-  });
+    attendanceForm.addEventListener('submit', (e) => {
+      e.preventDefault(); // remove this if you want normal form submit
+      console.log('Name:', attendanceForm.name.value);
+      console.log('Attendance:', attendanceForm.attendance.value);
+      console.log('Guests:', attendanceForm.guests.value);
+      console.log('Message:', attendanceForm.message.value);
+    });
+  }
 
   /* ---------------------------
-     Main Intro
+     Init after intro
   --------------------------- */
 
-  const mainIntro = document.querySelector('#main-intro');
-  const mainIntroEnterBtn = document.querySelector('#main-intro-enter-btn');
-  const mainLoading = document.querySelector('#main-loading');
-  const mainLoadingPercentage = document.querySelector('#main-loading-percentage');
-
-  const mainImagePaths = [
-    `/images/bg-intro.jpg`,
-    `/images/bg-plant1.png`,
-    `/images/bg-plant2.png`,
-    `/images/bg-plant3.png`,
-    `/images/bg-plant4.png`,
-    `/images/bride.jpg`,
-    `/images/groom.jpg`,
-    `/images/couple.png`,
-  ];
-  const catImagePaths = getCatImagePaths();
-  const totalImageAssets = mainImagePaths.length + catImagePaths.length;
-
-  let loaded = 0;
-
-  function preloadImageWithProgress(src, total, onProgress) {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        loaded++;
-        onProgress(loaded / total);
-        resolve(img);
-      };
-      img.onerror = reject;
-      img.src = src;
-    });
+  function setupAfterIntro() {
+    setupBirdAnimation();
+    const { updateCatOnScroll } = setupCatAnimation();
+    const { horizontalTween } = setupHorizontalScroll(updateCatOnScroll);
+    setupOtherAnimations(horizontalTween);
+    setupReservationForm();
   }
 
-  async function preloadMainImageAssets() {
-    await Promise.all(
-      mainImagePaths.map((src) => preloadImageWithProgress(src, totalImageAssets, handleMainLoadingProgress))
-    );
-    const catImageObjects = await Promise.all(
-      catImagePaths.map((src) => preloadImageWithProgress(src, totalImageAssets, handleMainLoadingProgress))
-    );
-    catImages.push(...catImageObjects);
-  }
+  /* ---------------------------
+     Boot
+  --------------------------- */
 
-  function handleMainLoadingProgress(percentage) {
-    mainLoadingPercentage.textContent = Math.floor(percentage * 100) + '%';
-  }
-
-  function handleMainIntroEnter() {
-    mainIntro.setAttribute('hidden', '');
-    document.body.classList.remove('no-scroll');
-  }
-
-  async function startIntro() {
-    await preloadMainImageAssets();
-
-    mainLoading.style.display = 'none';
-    mainIntroEnterBtn.style.display = 'block';
+  async function start() {
+    await preloadAllAssets();
+    mainLoading.hidden = true;
     mainIntroEnterBtn.addEventListener('click', handleMainIntroEnter);
-    initCatAnimation();
+    updateDateTimeElements();
+    updateCountdownElements();
   }
 
-  startIntro();
+  start();
 });
