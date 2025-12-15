@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateDateTimeElements() {
     const parts = dateFormat.format(EVENT_START_DATE).split(' ');
-    const formattedDate = `${parts[0]} ${parts.slice(1).join(' ')}`;
+    const formattedDate = `${parts[0].replace(',', '')}, ${parts.slice(1).join(' ')}`;
     const formattedTimeRange = `${timeFormat.format(EVENT_START_DATE)} - ${timeFormat.format(EVENT_END_DATE)}`;
     document.querySelectorAll('[data-date]').forEach((el) => (el.textContent = formattedDate));
     document.querySelectorAll('[data-time]').forEach((el) => (el.textContent = formattedTimeRange));
@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ease: 'power2.out',
         scrollTrigger: {
           trigger: el,
-          start: 'center bottom',
+          start: 'center-=20% bottom',
           toggleActions: 'play none none reverse',
         },
       });
