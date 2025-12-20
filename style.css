@@ -79,10 +79,12 @@ img {
 #main-intro .main-intro-texts {
   text-align: center;
   height: 100%;
+  width: 100%;
   padding: 8rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  background-color: rgba(255, 255, 255, 0.8);
 }
 #main-intro .main-intro-texts > div:nth-child(1) > h1 {
   font-size: 3rem;
@@ -102,6 +104,7 @@ img {
 }
 #main-intro-enter-btn {
   width: 100%;
+  max-width: 15rem;
   height: 3rem;
   margin-top: 5rem;
   outline: none;
@@ -266,6 +269,7 @@ img {
   text-decoration: none;
   text-transform: uppercase;
   font-size: 0.875rem;
+  line-height: 0.875rem;
   padding: 1rem;
   border: 1px solid black;
   background-color: transparent;
@@ -375,8 +379,30 @@ img {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5rem;
+  height: 100%;
   width: 1024px !important;
+}
+#groom-bride .content {
+  position: relative;
+  max-width: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5rem;
+  padding: 4rem;
+}
+#groom-bride img[alt='border-top-left'],
+#groom-bride img[alt='border-bottom-right'] {
+  position: absolute;
+  width: 100px;
+}
+#groom-bride img[alt='border-top-left'] {
+  top: 0;
+  left: 0;
+}
+#groom-bride img[alt='border-bottom-right'] {
+  bottom: 0;
+  right: 0;
 }
 #groom-bride__bride,
 #groom-bride__groom {
@@ -384,10 +410,11 @@ img {
 }
 #groom-bride .picture {
   width: 200px;
-  height: 200px;
+  height: 250px;
   border-radius: 0.5rem;
   overflow: hidden;
   margin: 1rem 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 #groom-bride .picture img {
   width: 100%;
@@ -418,9 +445,17 @@ img {
   flex-direction: column;
 }
 #time-loc .content {
+  position: relative;
   width: 100%;
   max-width: 756px;
   padding: 2rem;
+}
+#time-loc .content img[alt='chandelier'] {
+  position: absolute;
+  top: -40vh;
+  right: 0;
+  height: 40vh;
+  width: auto;
 }
 #time-loc .title {
   text-transform: uppercase;
@@ -433,6 +468,19 @@ img {
   font-weight: bold;
   margin-bottom: 1rem;
 }
+#time-loc .location-wrapper {
+  position: relative;
+  display: flex;
+  gap: 1rem;
+}
+#time-loc .location-image {
+  height: 10rem;
+}
+#time-loc .location-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
 #time-loc .location-name {
   font-size: 2rem;
   font-weight: normal;
@@ -441,6 +489,15 @@ img {
 #time-loc .map-btn {
   float: right;
   margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+}
+#time-loc .map-btn svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
 }
 
 #countdown {
@@ -448,6 +505,79 @@ img {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+}
+#countdown .content {
+  position: relative;
+  padding: 4rem;
+
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+  #countdown .content {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+#countdown .content img[alt='calendar-frame-blank'] {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 200%;
+}
+#countdown .countdown-frame-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  user-select: none;
+}
+#countdown .countdown-frame-wrapper .countdown-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.countdown-frame div:nth-child(1)::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.countdown-frame div:nth-child(1)::after {
+  content: '';
+  position: absolute;
+  top: -39px;
+  left: 0;
+  width: 100%;
+  height: 40px;
+  background-color: hsl(217, 12%, 50%);
+}
+.countdown-frame div:nth-child(2)::before {
+  content: '';
+  position: absolute;
+  top: -39px;
+  left: 80px;
+  width: 2px;
+  height: 50vh;
+  background-color: black;
+  transform: translate(0, -100%);
+}
+.countdown-frame div:nth-child(2)::after {
+  content: '';
+  position: absolute;
+  top: -39px;
+  right: 80px;
+  width: 2px;
+  height: 50vh;
+  background-color: black;
+  transform: translate(0, -100%);
 }
 #countdown h1 {
   text-transform: uppercase;
@@ -463,6 +593,15 @@ img {
 }
 #countdown #save-date-btn {
   float: right;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+}
+#countdown #save-date-btn svg {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
 }
 
 #reservation {

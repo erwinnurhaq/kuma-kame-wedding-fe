@@ -42,15 +42,18 @@ document.addEventListener('DOMContentLoaded', () => {
   --------------------------- */
 
   const MAIN_IMAGES_PATHS = [
-    `/images/bg-intro-overlay.webp`,
     `/images/bg-intro.jpg`,
     `/images/bg-plant1.png`,
     `/images/bg-plant2.png`,
     `/images/bg-plant3.png`,
     `/images/bg-plant4.png`,
-    `/images/bride.jpg`,
-    `/images/groom.jpg`,
+    `/images/border-edge-bottom-right.png`,
+    `/images/border-edge-top-left.png`,
+    `/images/bride.webp`,
+    `/images/chandelier.png`,
     `/images/couple.png`,
+    `/images/groom.webp`,
+    `/images/sepiring-nusantara.png`,
   ];
   const CAT_FRAME_COUNT = 10;
   const CAT_IMAGES_PATHS = Array.from(
@@ -238,11 +241,28 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     gsap.utils
-      .toArray(['#groom-bride__bride', '#groom-bride__groom', '#time-loc .content', '#countdown .content'])
+      .toArray(['#groom-bride__bride', '#groom-bride__groom'])
       .forEach((el) => {
         gsap.from(el, {
           opacity: 0,
           y: 80,
+          duration: 0.8,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: el,
+            containerAnimation: horizontalTween,
+            start: 'left right-=20%',
+            toggleActions: 'play none none reverse',
+          },
+        });
+      });
+
+    gsap.utils
+      .toArray(['#time-loc .content', '#countdown .content'])
+      .forEach((el) => {
+        gsap.from(el, {
+          opacity: 0,
+          y: -80,
           duration: 0.8,
           ease: 'power2.out',
           scrollTrigger: {
@@ -336,10 +356,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function setupAfterIntro() {
     setupBirdAnimation();
-    const { updateCatOnScroll } = setupCatAnimation();
-    const { horizontalTween } = setupHorizontalScroll(updateCatOnScroll);
-    setupOtherAnimations(horizontalTween);
-    setupReservationForm();
   }
 
   /* ---------------------------
@@ -350,8 +366,13 @@ document.addEventListener('DOMContentLoaded', () => {
     await preloadAllAssets();
     mainLoading.hidden = true;
     mainIntroEnterBtn.addEventListener('click', handleMainIntroEnter);
+    // handleMainIntroEnter();
     updateDateTimeElements();
     updateCountdownElements();
+    setupReservationForm();
+    const { updateCatOnScroll } = setupCatAnimation();
+    const { horizontalTween } = setupHorizontalScroll(updateCatOnScroll);
+    setupOtherAnimations(horizontalTween);
   }
 
   start();
