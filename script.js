@@ -4,11 +4,15 @@ window.onbeforeunload = function () {
 
 document.addEventListener('DOMContentLoaded', () => {
   /* ---------------------------
-     Lib Initialization
+     Lib Initialization & Contants
   --------------------------- */
+  const notyf = new Notyf({ position: { x: 'center', y: 'top' }});
   const DPI = Math.min(window.devicePixelRatio || 1, 2);
   gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
   document.body.classList.add('no-scroll');
+
+  // const API_URL = `http://localhost:3000`;
+  const API_URL = `https://v-kumakamewedding-api.erwww.in`;
 
   /* ---------------------------
      Event Date & Time Formatting
@@ -29,12 +33,26 @@ document.addEventListener('DOMContentLoaded', () => {
     hour12: true,
   });
 
+  const timeStampFormat = new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
+
   function updateDateTimeElements() {
     const parts = dateFormat.format(EVENT_START_DATE).split(' ');
     const formattedDate = `${parts[0].replace(',', '')}, ${parts.slice(1).join(' ')}`;
     const formattedTimeRange = `${timeFormat.format(EVENT_START_DATE)} - ${timeFormat.format(EVENT_END_DATE)}`;
     document.querySelectorAll('[data-date]').forEach((el) => (el.textContent = formattedDate));
     document.querySelectorAll('[data-time]').forEach((el) => (el.textContent = formattedTimeRange));
+  }
+
+  function formatTimestamp(timeString) {
+    const date = new Date(timeString.replace(' ', 'T') + 'Z');
+    return timeStampFormat.format(date);
   }
 
   /* ---------------------------
@@ -240,39 +258,35 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    gsap.utils
-      .toArray(['#groom-bride__bride', '#groom-bride__groom'])
-      .forEach((el) => {
-        gsap.from(el, {
-          opacity: 0,
-          y: 80,
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: el,
-            containerAnimation: horizontalTween,
-            start: 'left right-=20%',
-            toggleActions: 'play none none reverse',
-          },
-        });
+    gsap.utils.toArray(['#groom-bride__bride', '#groom-bride__groom']).forEach((el) => {
+      gsap.from(el, {
+        opacity: 0,
+        y: 80,
+        duration: 0.8,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: el,
+          containerAnimation: horizontalTween,
+          start: 'left right-=20%',
+          toggleActions: 'play none none reverse',
+        },
       });
+    });
 
-    gsap.utils
-      .toArray(['#time-loc .content', '#countdown .content'])
-      .forEach((el) => {
-        gsap.from(el, {
-          opacity: 0,
-          y: -80,
-          duration: 0.8,
-          ease: 'power2.out',
-          scrollTrigger: {
-            trigger: el,
-            containerAnimation: horizontalTween,
-            start: 'left right-=20%',
-            toggleActions: 'play none none reverse',
-          },
-        });
+    gsap.utils.toArray(['#time-loc .content', '#countdown .content']).forEach((el) => {
+      gsap.from(el, {
+        opacity: 0,
+        y: -80,
+        duration: 0.8,
+        ease: 'power2.out',
+        scrollTrigger: {
+          trigger: el,
+          containerAnimation: horizontalTween,
+          start: 'left right-=20%',
+          toggleActions: 'play none none reverse',
+        },
       });
+    });
 
     gsap.to(`#bird-canvas`, {
       autoAlpha: 0,
@@ -329,8 +343,109 @@ document.addEventListener('DOMContentLoaded', () => {
   --------------------------- */
 
   const attendanceForm = document.querySelector('#attendance-form');
+  const attendanceFormSubmitBtn = document.querySelector('#attendance-form .submit-btn');
   const attendanceInput = document.querySelector('#attd_attendance');
   const attendanceButtons = attendanceForm.querySelectorAll('#attendance-form .attendance .action-btn');
+  const messagesSection = document.querySelector('#messages');
+  const messagesEmptyContainer = document.querySelector('#messages .message-empty');
+  const messagesContentContainer = document.querySelector('#messages .message-content');
+  const messagesListContainer = document.querySelector('#messages .message-list');
+  const messagesPaginationInfo = document.querySelector('#messages .message-pagination-info');
+  const messagesPaginationPrevBtn = document.querySelector('#messages .message-pagination-btn.btn-prev');
+  const messagesPaginationNextBtn = document.querySelector('#messages .message-pagination-btn.btn-next');
+
+  let currentPagination = { page: 1, totalPages: 1 };
+
+  function focusMessagesSection() {
+    messagesSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  function updateMessages(data) {
+    messagesListContainer.innerHTML = data
+      .map(
+        (i) => `
+          <div class="message-item">
+            <p data-name>${i.name}</p>
+            <p data-message>${i.message || '-'}</p>
+            <p data-date>${formatTimestamp(i.updatedAt)}</p>
+          </div>
+        `
+      )
+      .join('');
+  }
+
+  function updatePaginationDisplay(pagination) {
+    currentPagination = pagination;
+    messagesPaginationPrevBtn.disabled = !pagination.hasPrev;
+    messagesPaginationNextBtn.disabled = !pagination.hasNext;
+    messagesPaginationInfo.innerHTML = `Page ${pagination.page} of ${pagination.totalPages}`;
+  }
+
+  function loadMessages(page = 1) {
+    messagesPaginationPrevBtn.disabled = true;
+    messagesPaginationNextBtn.disabled = true;
+
+    fetch(`${API_URL}/api/attendance?page=${page}&limit=5`)
+      .then((res) => {
+        if (!res.ok) {
+          notyf.error('Failed to get the messages. Please try again');
+          return;
+        }
+        return res.json();
+      })
+      .then((res) => {
+        const { data, pagination } = res;
+
+        if (data.length > 0) {
+          messagesEmptyContainer.style.display = 'none';
+          messagesContentContainer.style.display = 'block';
+          updateMessages(data);
+          updatePaginationDisplay(pagination);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        notyf.error('Failed to get the messages. Please try again');
+      })
+  }
+
+  function submitReservationForm(data) {
+    attendanceFormSubmitBtn.disabled = true;
+
+    fetch(`${API_URL}/api/attendance`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          notyf.error('Failed to submit form. Please try again');
+          return;
+        }
+        return res.json();
+      })
+      .then((res) => {
+        notyf.success(`Thank you for your response!`);
+      })
+      .catch((err) => {
+        console.error(err);
+        notyf.error('Failed to submit form. Please try again');
+      })
+      .finally(() => {
+        attendanceForm.reset();
+        attendanceButtons.forEach((btn) => btn.classList.remove('active'));
+        attendanceFormSubmitBtn.disabled = false;
+        loadMessages();
+        focusMessagesSection();
+      });
+  }
+
+  function toggleShowTotalGuestsInput(isShow) {
+    const elInput = document.querySelector('#attd_guests');
+    const elLabel = document.querySelector('#attd_guests_label');
+    elInput.style.display = isShow ? 'block' : 'none';
+    elLabel.style.display = isShow ? 'block' : 'none';
+  }
 
   function setupReservationForm() {
     attendanceButtons.forEach((button) => {
@@ -338,15 +453,34 @@ document.addEventListener('DOMContentLoaded', () => {
         attendanceInput.value = button.value;
         attendanceButtons.forEach((btn) => btn.classList.remove('active'));
         button.classList.add('active');
+        toggleShowTotalGuestsInput(button.value !== 'no');
       });
     });
 
     attendanceForm.addEventListener('submit', (e) => {
       e.preventDefault(); // remove this if you want normal form submit
-      console.log('Name:', attendanceForm.name.value);
-      console.log('Attendance:', attendanceForm.attendance.value);
-      console.log('Guests:', attendanceForm.guests.value);
-      console.log('Message:', attendanceForm.message.value);
+      const data = {
+        name: attendanceForm.name.value,
+        attendance: attendanceForm.attendance.value || 'no',
+        totalGuests:
+          attendanceForm.attendance.value === 'no'
+            ? 0
+            : attendanceForm.guests.value
+            ? parseInt(attendanceForm.guests.value, 10)
+            : 1,
+        message: attendanceForm.message.value,
+      };
+
+      submitReservationForm(data);
+    });
+
+    messagesPaginationPrevBtn.addEventListener('click', () => {
+      loadMessages(currentPagination.page - 1);
+      focusMessagesSection();
+    });
+    messagesPaginationNextBtn.addEventListener('click', () => {
+      loadMessages(currentPagination.page + 1);
+      focusMessagesSection();
     });
   }
 
@@ -373,6 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const { updateCatOnScroll } = setupCatAnimation();
     const { horizontalTween } = setupHorizontalScroll(updateCatOnScroll);
     setupOtherAnimations(horizontalTween);
+    loadMessages();
   }
 
   start();

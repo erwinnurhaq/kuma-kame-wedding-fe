@@ -9,6 +9,8 @@
 :root {
   --bar-height: 2px;
   --bar-color: black;
+  --dark-grey-accent-1: hsl(217, 12%, 50%);
+  --grey-accent-1: hsl(217, 12%, 75%);
 }
 
 html,
@@ -265,7 +267,8 @@ img {
   margin: auto;
 }
 
-.action-btn {
+.action-btn,
+.submit-btn {
   text-decoration: none;
   text-transform: uppercase;
   font-size: 0.875rem;
@@ -277,10 +280,24 @@ img {
   cursor: pointer;
   transition: background-color 0.1s ease-in-out;
 }
-.action-btn:hover,
+.action-btn:not(:disabled):hover,
 .action-btn.active {
   background-color: #adbed8;
   color: white;
+}
+.action-btn:disabled {
+  cursor: default;
+  border-color: var(--grey-accent-1);
+  color: var(--grey-accent-1);
+}
+
+.submit-btn {
+  background-color: black;
+  color: #fff;
+}
+.submit-btn:disabled {
+  background-color: var(--dark-grey-accent-1);
+  cursor: default;
 }
 
 #intro {
@@ -443,6 +460,7 @@ img {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  max-width: 1024px;
 }
 #time-loc .content {
   position: relative;
@@ -509,6 +527,7 @@ img {
 #countdown .content {
   position: relative;
   padding: 4rem;
+  margin-left: -30vw;
 
   background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -557,7 +576,7 @@ img {
   left: 0;
   width: 100%;
   height: 40px;
-  background-color: hsl(217, 12%, 50%);
+  background-color: var(--dark-grey-accent-1);
 }
 .countdown-frame div:nth-child(2)::before {
   content: '';
@@ -628,6 +647,70 @@ img {
   font-size: 2rem;
 }
 
+#messages {
+  position: relative;
+  padding: 3rem;
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+@supports (backdrop-filter: blur(10px)) or (-webkit-backdrop-filter: blur(10px)) {
+  #messages {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+
+#messages .message-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 8rem;
+}
+#messages .message-content {
+  display: none;
+  padding: 0 3rem;
+}
+#messages .message-list {
+  padding: 1rem 2rem;
+  min-height: 300px;
+}
+#messages .message-item {
+  padding: 1rem 0;
+  display: grid;
+  grid-template-columns: 15rem 1fr 10rem;
+  gap: 1.5rem;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--grey-accent-1);
+}
+#messages .message-item p[data-name] {
+  font-weight: bold;
+  word-break: break-all;
+}
+#messages .message-item p[data-message] {
+  word-break: break-all;
+}
+#messages .message-item p[data-date] {
+  text-align: right;
+  font-style: italic;
+  color: var(--dark-grey-accent-1);
+}
+#messages .message-pagination {
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+#messages .message-pagination-info {
+  padding-right: 1.5rem;
+  font-size: 0.875rem;
+  line-height: 0.875rem;
+}
+#messages .message-pagination-btn {
+  padding: 0.5rem 1rem;
+}
+
 #ending {
   display: flex;
   align-items: center;
@@ -683,18 +766,13 @@ canvas.cat-canvas {
 }
 #attendance-form .attendance button {
   flex: 1;
-  padding: 10px 0;
+  padding: 10px 7px;
 }
 #attendance-form button.submit-btn {
-  background-color: black;
-  color: #fff;
-  border: none;
-  padding: 10px 25px;
-  cursor: pointer;
-  font-size: 14px;
+  min-width: 8rem;
 }
 
-@media screen and (max-width: 1439px) {
+@media screen and (max-width: 1440px) {
   #main-intro .main-intro-texts {
     padding: 7rem 2rem;
   }
@@ -713,7 +791,7 @@ canvas.cat-canvas {
   }
 }
 
-@media screen and (max-width: 1279px) {
+@media screen and (max-width: 1280px) {
   #main-intro .main-intro-texts {
     padding: 6rem 2rem;
   }
@@ -745,7 +823,7 @@ canvas.cat-canvas {
   }
 }
 
-@media screen and (max-width: 1023px) {
+@media screen and (max-width: 1024px) {
   #main-bg img[alt='bg-plant1'] {
     left: -2.5%;
   }
@@ -791,9 +869,20 @@ canvas.cat-canvas {
     width: calc(550px / 3);
     height: calc(380px / 3);
   }
+
+  #messages {
+    padding: 2.5rem;
+  }
+  #messages .message-content {
+    padding: 0;
+  }
+  #messages .message-item {
+    grid-template-columns: 10rem 1fr 8rem;
+    gap: 1rem;
+  }
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 768px) {
   #main-bg img[alt^='bg-plant'] {
     min-width: 140px;
   }
@@ -838,6 +927,31 @@ canvas.cat-canvas {
     gap: 2.5rem;
     padding: 2.5rem;
   }
+  #reservation h1 {
+    font-size: 1rem;
+  }
+  #reservation h2 {
+    font-size: 1.5rem;
+  }
+
+  #attendance-form .attendance button {
+    font-size: 0.75rem;
+  }
+  #attendance-form button.submit-btn {
+    width: 100%;
+  }
+
+  #messages .message-list,
+  #messages .message-pagination {
+    padding: 1rem 0;
+  }
+  #messages .message-item {
+    grid-template-columns: 10rem 1fr;
+    gap: 1.5rem;
+  }
+  #messages .message-item p[data-date] {
+    grid-column: 1 / 3;
+  }
 }
 
 @media screen and (max-width: 576px) {
@@ -870,9 +984,22 @@ canvas.cat-canvas {
   #surah-quote .content {
     padding: 17.5%;
   }
+
+  #messages .message-item {
+    grid-template-columns: 1fr;
+    grid-template-rows: repeat(3, auto);
+    gap: 1rem;
+  }
+  #messages .message-item p[data-message] {
+    grid-row: 2 / 3;
+  }
+  #messages .message-item p[data-date] {
+    grid-row: 3 / 4;
+    font-size: 0.75rem;
+  }
 }
 
-@media screen and (max-width: 374px) {
+@media screen and (max-width: 375px) {
   #main-intro .main-intro-texts > div:nth-child(1) > h1 {
     font-size: 1.75rem;
   }
@@ -893,18 +1020,25 @@ canvas.cat-canvas {
   #intro p[data-date] {
     font-size: 0.875rem;
   }
+
+  #messages .message-pagination-info {
+    padding-right: 0.75rem;
+  }
+  #messages .message-pagination-btn {
+    padding: 0.5rem 0.75rem;
+  }
 }
 
-@media screen and (max-height: 1439px) {
+@media screen and (max-height: 1440px) {
 }
 
-@media screen and (max-height: 1279px) {
+@media screen and (max-height: 1280px) {
 }
 
-@media screen and (max-height: 1023px) {
+@media screen and (max-height: 1024px) {
 }
 
-@media screen and (max-height: 767px) {
+@media screen and (max-height: 768px) {
   #main-intro .main-intro-texts {
     padding: 4rem 2rem;
   }
@@ -951,7 +1085,7 @@ canvas.cat-canvas {
   }
 }
 
-@media screen and (max-height: 374px) {
+@media screen and (max-height: 375px) {
   #main-intro .main-intro-texts {
     padding: 1.5rem;
   }
