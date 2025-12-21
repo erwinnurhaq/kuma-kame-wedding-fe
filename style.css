@@ -217,24 +217,6 @@ img {
   animation-delay: -4s;
 }
 
-@keyframes plant-sway {
-  0% {
-    transform: rotate(0deg) translateX(0);
-  }
-  25% {
-    transform: rotate(3deg) translateX(2px);
-  }
-  50% {
-    transform: rotate(0deg) translateX(0);
-  }
-  75% {
-    transform: rotate(-3deg) translateX(-2px);
-  }
-  100% {
-    transform: rotate(0deg) translateX(0);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   #main-bg img[alt^='bg-plant'] {
     animation: none;
@@ -403,7 +385,7 @@ img {
   position: relative;
   max-width: none;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   gap: 5rem;
   padding: 4rem;
@@ -470,10 +452,11 @@ img {
 }
 #time-loc .content img[alt='chandelier'] {
   position: absolute;
-  top: -40vh;
+  top: 0;
   right: 0;
-  height: 40vh;
+  height: 500px;
   width: auto;
+  transform: translate(0, -90%);
 }
 #time-loc .title {
   text-transform: uppercase;
@@ -505,7 +488,7 @@ img {
   margin-bottom: 0.4rem;
 }
 #time-loc .map-btn {
-  float: right;
+  width: 12rem;
   margin-top: 1rem;
   display: flex;
   align-items: center;
@@ -527,7 +510,7 @@ img {
 #countdown .content {
   position: relative;
   padding: 4rem;
-  margin-left: -30vw;
+  margin-left: -15vw;
 
   background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -616,6 +599,7 @@ img {
   align-items: center;
   justify-content: center;
   gap: 0.7rem;
+  margin-top: 2rem;
 }
 #countdown #save-date-btn svg {
   width: 1.125rem;
@@ -784,6 +768,19 @@ canvas.cat-canvas {
     font-size: 1.25rem;
   }
 
+  #countdown .content {
+    padding: 3.5rem;
+  }
+  #countdown h1 {
+    font-size: 1.125rem;
+  }
+  #countdown .countdown-time p {
+    font-size: 1.75rem;
+  }
+  #countdown .countdown-time p span {
+    font-size: 4rem;
+  }
+
   canvas.cat-canvas {
     bottom: calc(var(--bar-height) - 29px);
     width: calc(550px / 2.25);
@@ -816,10 +813,51 @@ canvas.cat-canvas {
     font-size: 1.125rem;
   }
 
+  #groom-bride .content {
+    padding: 3.75rem;
+  }
+  #groom-bride h1 {
+    font-size: 1.125rem;
+  }
+  #groom-bride h2 {
+    font-size: 1.75rem;
+    margin-bottom: 0.875rem;
+  }
+  #groom-bride h3 {
+    margin-bottom: 0.875rem;
+    font-size: 1rem;
+  }
+  #groom-bride h4 {
+    font-size: 1rem;
+  }
+
+  #countdown .content {
+    padding: 3rem;
+    margin-left: 0;
+  }
+  #countdown h1 {
+    font-size: 1rem;
+  }
+  #countdown .countdown-time p {
+    font-size: 1.5rem;
+  }
+  #countdown .countdown-time p span {
+    font-size: 3rem;
+  }
+
   canvas.cat-canvas {
     bottom: calc(var(--bar-height) - 26px);
     width: calc(550px / 2.5);
     height: calc(380px / 2.5);
+  }
+
+  #ending h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+  }
+  #ending h2 {
+    font-size: 1.75rem;
+    margin-bottom: 1.25rem;
   }
 }
 
@@ -864,10 +902,70 @@ canvas.cat-canvas {
     font-size: 1rem;
   }
 
+  #groom-bride .content {
+    padding: 3.5rem;
+  }
+  #groom-bride .picture {
+    width: 180px;
+    height: 225px;
+  }
+  #groom-bride h1 {
+    font-size: 1rem;
+  }
+  #groom-bride h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.875rem;
+  }
+  #groom-bride h3 {
+    margin-bottom: 0.875rem;
+    font-size: 0.875rem;
+  }
+  #groom-bride h4 {
+    font-size: 0.875rem;
+  }
+
+  #time-loc .content {
+    max-width: 80vw;
+  }
+  #time-loc .title {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+  }
+  #time-loc .time {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  #time-loc .location-name {
+    font-size: 1.5rem;
+    margin-bottom: 0.4rem;
+  }
+  #time-loc .location-detail {
+    font-size: 0.875rem;
+  }
+  #time-loc .location-image {
+    height: 7rem;
+  }
+
+  #countdown .content {
+    padding: 2.5rem;
+  }
+
   canvas.cat-canvas {
     bottom: calc(var(--bar-height) - 22px);
     width: calc(550px / 3);
     height: calc(380px / 3);
+  }
+
+  #ending .content {
+    max-width: 80vw;
+  }
+  #ending h1 {
+    font-size: 2.75rem;
+    margin-bottom: 0.875rem;
+  }
+  #ending h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1.125rem;
   }
 
   #messages {
@@ -922,6 +1020,41 @@ canvas.cat-canvas {
     font-size: 2.75rem;
   }
 
+  #time-loc .content img[alt='chandelier'] {
+    height: 450px;
+  }
+  #time-loc .title {
+    font-size: 1.125rem;
+    margin-bottom: 0.875rem;
+  }
+  #time-loc .time {
+    font-size: 2.125rem;
+    margin-bottom: 0.875rem;
+  }
+  #time-loc .location-name {
+    font-size: 1.75rem;
+    margin-bottom: 0.4rem;
+  }
+  #time-loc .location-image {
+    height: 7rem;
+  }
+  #time-loc .map-btn {
+    margin-top: 0;
+  }
+
+  #countdown .content {
+    padding: 2rem;
+  }
+  #countdown .countdown-time p {
+    font-size: 1.4rem;
+  }
+  #countdown .countdown-time p span {
+    font-size: 2.75rem;
+  }
+  #countdown #save-date-btn {
+    margin-top: 1rem;
+  }
+
   #reservation .content {
     grid-template-columns: 1fr;
     gap: 2.5rem;
@@ -951,6 +1084,15 @@ canvas.cat-canvas {
   }
   #messages .message-item p[data-date] {
     grid-column: 1 / 3;
+  }
+
+  #ending h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.875rem;
+  }
+  #ending h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.125rem;
   }
 }
 
@@ -985,6 +1127,39 @@ canvas.cat-canvas {
     padding: 17.5%;
   }
 
+  #time-loc .content {
+    max-width: 90vw;
+  }
+  #time-loc .content img[alt='chandelier'] {
+    height: 400px;
+  }
+  #time-loc .title {
+    font-size: 1rem;
+    margin-bottom: 0.875rem;
+    width: 11rem;
+  }
+  #time-loc .time {
+    font-size: 1.8rem;
+    margin-bottom: 0.875rem;
+  }
+  #time-loc .time [data-date] br {
+    display: block !important;
+  }
+  #time-loc .location-name {
+    font-size: 1.25rem;
+    margin-bottom: 0.4rem;
+  }
+  #time-loc .location-detail {
+    font-size: 0.8rem;
+  }
+  #time-loc .location-image {
+    height: 8rem;
+  }
+
+  #countdown .content {
+    padding: 1.5rem;
+  }
+
   #messages .message-item {
     grid-template-columns: 1fr;
     grid-template-rows: repeat(3, auto);
@@ -996,6 +1171,15 @@ canvas.cat-canvas {
   #messages .message-item p[data-date] {
     grid-row: 3 / 4;
     font-size: 0.75rem;
+  }
+
+  #ending h1 {
+    font-size: 2.25rem;
+    margin-bottom: 0.875rem;
+  }
+  #ending h2 {
+    font-size: 1.125rem;
+    margin-bottom: 1.125rem;
   }
 }
 
@@ -1021,11 +1205,64 @@ canvas.cat-canvas {
     font-size: 0.875rem;
   }
 
+  #groom-bride .content {
+    padding: 3.25rem;
+  }
+  #groom-bride .picture {
+    width: 160px;
+    height: 200px;
+  }
+  #groom-bride h1 {
+    font-size: 0.875rem;
+  }
+  #groom-bride h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+  #groom-bride h3 {
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+  }
+  #groom-bride h4 {
+    font-size: 0.75rem;
+  }
+
+  #time-loc .content img[alt='chandelier'] {
+    height: 350px;
+  }
+  #time-loc .title {
+    font-size: 0.875rem;
+    margin-bottom: 0.75rem;
+  }
+  #time-loc .time {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+  }
+  #time-loc .location-name {
+    font-size: 1.25rem;
+    margin-bottom: 0.4rem;
+  }
+  #time-loc .location-detail {
+    font-size: 0.75rem;
+  }
+  #time-loc .location-image {
+    height: 6rem;
+  }
+
   #messages .message-pagination-info {
     padding-right: 0.75rem;
   }
   #messages .message-pagination-btn {
     padding: 0.5rem 0.75rem;
+  }
+
+    #ending h1 {
+    font-size: 2rem;
+    margin-bottom: 0.875rem;
+  }
+  #ending h2 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
   }
 }
 
@@ -1057,6 +1294,28 @@ canvas.cat-canvas {
   #main-intro-enter-btn {
     margin-top: 3rem;
   }
+
+  #groom-bride .content {
+    padding: 3.5rem;
+  }
+  #groom-bride .picture {
+    width: 180px;
+    height: 225px;
+  }
+  #groom-bride h1 {
+    font-size: 1rem;
+  }
+  #groom-bride h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.875rem;
+  }
+  #groom-bride h3 {
+    margin-bottom: 0.875rem;
+    font-size: 0.875rem;
+  }
+  #groom-bride h4 {
+    font-size: 0.875rem;
+  }
 }
 
 @media screen and (max-height: 576px) {
@@ -1083,6 +1342,28 @@ canvas.cat-canvas {
   #intro .couple-img {
     max-width: 80vh;
   }
+
+  #groom-bride .content {
+    padding: 2.5rem;
+  }
+  #groom-bride .picture {
+    width: 140px;
+    height: 175px;
+  }
+  #groom-bride h1 {
+    font-size: 0.875rem;
+  }
+  #groom-bride h2 {
+    font-size: 1.125rem;
+    margin-bottom: 0.75rem;
+  }
+  #groom-bride h3 {
+    margin-bottom: 0.5rem;
+    font-size: 0.675rem;
+  }
+  #groom-bride h4 {
+    font-size: 0.675rem;
+  }
 }
 
 @media screen and (max-height: 375px) {
@@ -1101,5 +1382,45 @@ canvas.cat-canvas {
 
   #intro .content {
     margin-top: -100px;
+  }
+
+  #surah-quote h1 {
+    font-size: 1rem;
+  }
+  #surah-quote h2 {
+    font-size: 0.875rem;
+  }
+
+  #groom-bride .content {
+    padding: 2.5rem;
+  }
+  #groom-bride .picture {
+    width: 140px;
+    height: 140px;
+  }
+  #groom-bride h1 {
+    font-size: 0.75rem;
+  }
+  #groom-bride h2 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+  }
+}
+
+@keyframes plant-sway {
+  0% {
+    transform: rotate(0deg) translateX(0);
+  }
+  25% {
+    transform: rotate(3deg) translateX(2px);
+  }
+  50% {
+    transform: rotate(0deg) translateX(0);
+  }
+  75% {
+    transform: rotate(-3deg) translateX(-2px);
+  }
+  100% {
+    transform: rotate(0deg) translateX(0);
   }
 }

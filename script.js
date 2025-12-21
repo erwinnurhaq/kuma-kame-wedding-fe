@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------------------------
      Lib Initialization & Contants
   --------------------------- */
-  const notyf = new Notyf({ position: { x: 'center', y: 'top' }});
+  const notyf = new Notyf({ position: { x: 'center', y: 'top' } });
   const DPI = Math.min(window.devicePixelRatio || 1, 2);
   gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
   document.body.classList.add('no-scroll');
@@ -44,10 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateDateTimeElements() {
     const parts = dateFormat.format(EVENT_START_DATE).split(' ');
-    const formattedDate = `${parts[0].replace(',', '')}, ${parts.slice(1).join(' ')}`;
+    const formattedDate = `${parts[0].replace(',', '')}, <br style="display:none;" />${parts.slice(1).join(' ')}`;
     const formattedTimeRange = `${timeFormat.format(EVENT_START_DATE)} - ${timeFormat.format(EVENT_END_DATE)}`;
-    document.querySelectorAll('[data-date]').forEach((el) => (el.textContent = formattedDate));
-    document.querySelectorAll('[data-time]').forEach((el) => (el.textContent = formattedTimeRange));
+    document.querySelectorAll('[data-date]').forEach((el) => (el.innerHTML = formattedDate));
+    document.querySelectorAll('[data-time]').forEach((el) => (el.innerHTML = formattedTimeRange));
   }
 
   function formatTimestamp(timeString) {
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentPagination = { page: 1, totalPages: 1 };
 
   function focusMessagesSection() {
-    messagesSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    messagesSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function updateMessages(data) {
@@ -406,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .catch((err) => {
         console.error(err);
         notyf.error('Failed to get the messages. Please try again');
-      })
+      });
   }
 
   function submitReservationForm(data) {
@@ -458,7 +458,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     attendanceForm.addEventListener('submit', (e) => {
-      e.preventDefault(); // remove this if you want normal form submit
+      e.preventDefault();
       const data = {
         name: attendanceForm.name.value,
         attendance: attendanceForm.attendance.value || 'no',
