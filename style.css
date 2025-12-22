@@ -25,7 +25,7 @@ body {
   font-optical-sizing: auto;
   font-style: normal;
   position: relative;
-  background: url('/images/bg-intro.jpg');
+  background: url('/images/bg-intro.webp');
   background-size: cover;
   background-position: left;
   background-repeat: no-repeat;
@@ -86,7 +86,9 @@ img {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: rgba(255, 255, 255, 0.8);
+  /* background-color: rgba(255, 255, 255, 0.7); */
+  background-color: rgba(0, 0, 0, 0.25);
+  color: white;
 }
 #main-intro .main-intro-texts > div:nth-child(1) > h1 {
   font-size: 3rem;
@@ -113,6 +115,8 @@ img {
   font-weight: bold;
   letter-spacing: 1px;
   cursor: pointer;
+  border-color: white;
+  color: white;
 }
 
 #main-loading {
@@ -131,10 +135,17 @@ img {
   transition: all 0.5s ease-in-out;
 }
 #main-loading[hidden] {
-  top: -100%;
   opacity: 0;
   pointer-events: none;
   user-select: none;
+  visibility: hidden;
+}
+#main-loading img {
+  width: 100px;
+  height: 100px;
+}
+#main-loading p {
+  margin-top: 1rem;
 }
 
 #main-bg {
@@ -443,6 +454,7 @@ img {
   justify-content: center;
   flex-direction: column;
   max-width: 1024px;
+  min-width: 576px;
 }
 #time-loc .content {
   position: relative;

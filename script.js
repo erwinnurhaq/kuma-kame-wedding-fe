@@ -60,23 +60,24 @@ document.addEventListener('DOMContentLoaded', () => {
   --------------------------- */
 
   const MAIN_IMAGES_PATHS = [
-    `/images/bg-intro.jpg`,
-    `/images/bg-plant1.png`,
-    `/images/bg-plant2.png`,
-    `/images/bg-plant3.png`,
-    `/images/bg-plant4.png`,
-    `/images/border-edge-bottom-right.png`,
-    `/images/border-edge-top-left.png`,
+    `/images/bg-intro-overlay.webp`,
+    `/images/bg-intro.webp`,
+    `/images/bg-plant1.webp`,
+    `/images/bg-plant2.webp`,
+    `/images/bg-plant3.webp`,
+    `/images/bg-plant4.webp`,
+    `/images/border-edge-bottom-right.webp`,
+    `/images/border-edge-top-left.webp`,
     `/images/bride.webp`,
-    `/images/chandelier.png`,
-    `/images/couple.png`,
+    `/images/chandelier.webp`,
+    `/images/couple.webp`,
     `/images/groom.webp`,
-    `/images/sepiring-nusantara.png`,
+    `/images/sepiring-nusantara.webp`,
   ];
   const CAT_FRAME_COUNT = 10;
   const CAT_IMAGES_PATHS = Array.from(
     { length: CAT_FRAME_COUNT },
-    (_, i) => `/images/cat_walking_frames_transparent_bg/frame_${String(i + 1).padStart(4, '0')}.png`
+    (_, i) => `/images/cat_walking_frames_transparent_bg/frame_${String(i + 1).padStart(4, '0')}.webp`
   );
   const TOTAL_IMAGES = MAIN_IMAGES_PATHS.length + CAT_IMAGES_PATHS.length;
   const CAT_IMAGES = [];
@@ -239,12 +240,20 @@ document.addEventListener('DOMContentLoaded', () => {
     return { updateCatOnScroll };
   }
 
+  function setupMainLoadingGifAnimation() {
+    gsap.from('#main-loading img', {
+      height: 0,
+      duration: 0.4,
+      ease: 'power2.in',
+    });
+  }
+
   /* ---------------------------
      Other Animation
   --------------------------- */
 
   function setupOtherAnimations(horizontalTween) {
-    gsap.utils.toArray(['#surah-quote .content', '#reservation .content']).forEach((el) => {
+    gsap.utils.toArray(['#reservation .content']).forEach((el) => {
       gsap.from(el, {
         opacity: 0,
         y: 80,
@@ -381,7 +390,7 @@ document.addEventListener('DOMContentLoaded', () => {
     messagesPaginationInfo.innerHTML = `Page ${pagination.page} of ${pagination.totalPages}`;
   }
 
-  function loadMessages(page = 1) {
+  function loadMessages(page = 1, cb) {
     messagesPaginationPrevBtn.disabled = true;
     messagesPaginationNextBtn.disabled = true;
 
@@ -401,6 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
           messagesContentContainer.style.display = 'block';
           updateMessages(data);
           updatePaginationDisplay(pagination);
+          cb?.();
         }
       })
       .catch((err) => {
@@ -435,8 +445,7 @@ document.addEventListener('DOMContentLoaded', () => {
         attendanceForm.reset();
         attendanceButtons.forEach((btn) => btn.classList.remove('active'));
         attendanceFormSubmitBtn.disabled = false;
-        loadMessages();
-        focusMessagesSection();
+        loadMessages(1, focusMessagesSection);
       });
   }
 
@@ -475,12 +484,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     messagesPaginationPrevBtn.addEventListener('click', () => {
-      loadMessages(currentPagination.page - 1);
-      focusMessagesSection();
+      loadMessages(currentPagination.page - 1, focusMessagesSection);
     });
     messagesPaginationNextBtn.addEventListener('click', () => {
-      loadMessages(currentPagination.page + 1);
-      focusMessagesSection();
+      loadMessages(currentPagination.page + 1, focusMessagesSection);
     });
   }
 
@@ -497,8 +504,11 @@ document.addEventListener('DOMContentLoaded', () => {
   --------------------------- */
 
   async function start() {
+    setupMainLoadingGifAnimation();
     await preloadAllAssets();
-    mainLoading.hidden = true;
+    setTimeout(() => {
+      mainLoading.hidden = true;
+    }, 700);
     mainIntroEnterBtn.addEventListener('click', handleMainIntroEnter);
     // handleMainIntroEnter();
     updateDateTimeElements();
