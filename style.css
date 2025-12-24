@@ -108,6 +108,7 @@ img {
   font-weight: normal;
   font-style: italic;
 }
+#main-intro-enter-btn2,
 #main-intro-enter-btn {
   width: 100%;
   max-width: 15rem;
@@ -119,6 +120,9 @@ img {
   cursor: pointer;
   border-color: white;
   color: white;
+}
+#main-intro-enter-btn2 {
+  margin-top: 0.2rem;
 }
 
 #main-loading {
@@ -457,7 +461,7 @@ img {
   flex-direction: column;
   width: auto !important;
   max-width: 2048px;
-  min-width: 576px;
+  min-width: 1024px;
 }
 #time-loc .content {
   display: flex;
@@ -471,16 +475,13 @@ img {
   max-width: 756px;
   padding: 2rem;
 }
-#time-loc .content > div:nth-child(2) {
-  width: 100%;
-  min-height: 500px;
-}
 #time-loc iframe {
   display: block;
-  width: 100%;
-  height: 100%;
-  min-height: calc(100vh - 15rem);
-  min-height: calc(100svh - 15rem);
+  width: 600px;
+  height: 60vh;
+  height: 60svh;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
 }
 #time-loc .content img[alt='chandelier'] {
   position: absolute;
@@ -1148,6 +1149,13 @@ canvas.cat-canvas {
     margin-top: 0;
   }
 
+  #time-loc iframe {
+    display: block;
+    width: 450px;
+    height: 60vh;
+    height: 60svh;
+  }
+
   #countdown .content {
     padding: 2rem;
   }
@@ -1270,6 +1278,12 @@ canvas.cat-canvas {
   }
   #time-loc .location-image {
     height: 8rem;
+  }
+  #time-loc iframe {
+    display: block;
+    width: 350px;
+    height: 60vh;
+    height: 60svh;
   }
 
   #countdown .content {
