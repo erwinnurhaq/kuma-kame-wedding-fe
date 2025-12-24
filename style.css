@@ -11,6 +11,8 @@
   --bar-color: black;
   --dark-grey-accent-1: hsl(217, 12%, 50%);
   --grey-accent-1: hsl(217, 12%, 75%);
+  --gallery-gap: clamp(10px, 4vw, 80px);
+  --gallery-gutter: 32px;
 }
 
 html,
@@ -453,14 +455,32 @@ img {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  max-width: 1024px;
+  width: auto !important;
+  max-width: 2048px;
   min-width: 576px;
 }
 #time-loc .content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+#time-loc .content > div {
   position: relative;
+  flex-shrink: 0;
   width: 100%;
   max-width: 756px;
   padding: 2rem;
+}
+#time-loc .content > div:nth-child(2) {
+  width: 100%;
+  min-height: 500px;
+}
+#time-loc iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: calc(100vh - 15rem);
+  min-height: calc(100svh - 15rem);
 }
 #time-loc .content img[alt='chandelier'] {
   position: absolute;
@@ -580,6 +600,7 @@ img {
   left: 80px;
   width: 2px;
   height: 50vh;
+  height: 50svh;
   background-color: black;
   transform: translate(0, -100%);
 }
@@ -590,6 +611,7 @@ img {
   right: 80px;
   width: 2px;
   height: 50vh;
+  height: 50svh;
   background-color: black;
   transform: translate(0, -100%);
 }
@@ -707,6 +729,58 @@ img {
   padding: 0.5rem 1rem;
 }
 
+#gallery {
+  position: relative;
+  height: calc(1280px * 2);
+}
+#gallery .content {
+  min-height: 100vh;
+  min-height: 100svh;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+#gallery .grid {
+  width: 100%;
+  max-width: 1024px;
+  padding: 0 var(--gallery-gutter);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--gallery-gap);
+  margin: 0 auto;
+  align-content: center;
+}
+#gallery .grid > div {
+  will-change: transform, opacity;
+}
+#gallery .grid .featured {
+  position: relative;
+  z-index: 1;
+}
+#gallery .grid .featured img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 100%;
+  object-fit: cover;
+  will-change: width, height, transform;
+}
+#gallery .grid img {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 0;
+}
+
 #ending {
   display: flex;
   align-items: center;
@@ -714,19 +788,32 @@ img {
 }
 #ending .content {
   text-align: center;
+  height: 100vh;
+  height: 100svh;
+  margin-top: calc(-100vh + 70px);
+  margin-top: calc(-100svh + 70px);
   max-width: 756px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column;
 }
 #ending h1 {
   font-size: 4rem;
-  margin-bottom: 1rem;
+  margin: 4rem 0 1rem 0;
+  color: rgba(255, 255, 255, 0.8);
 }
 #ending h2 {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: normal;
+  padding: 0 7rem;
   margin-bottom: 1.5rem;
+  color: rgba(255, 255, 255, 0.8);
 }
 #ending h3 {
   font-weight: normal;
+  font-size: 1.5rem;
+  margin-bottom: 28px;
 }
 
 /* CAT */
@@ -874,6 +961,10 @@ canvas.cat-canvas {
 }
 
 @media screen and (max-width: 1024px) {
+  /* #gallery .grid {
+    grid-template-columns: repeat(4, 1fr);
+  } */
+
   #main-bg img[alt='bg-plant1'] {
     left: -2.5%;
   }
@@ -936,7 +1027,7 @@ canvas.cat-canvas {
     font-size: 0.875rem;
   }
 
-  #time-loc .content {
+  #time-loc .content > div:first-child {
     max-width: 80vw;
   }
   #time-loc .title {
@@ -973,11 +1064,10 @@ canvas.cat-canvas {
   }
   #ending h1 {
     font-size: 2.75rem;
-    margin-bottom: 0.875rem;
+    margin: 1rem 0 0.875rem 0;
   }
   #ending h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.125rem;
+    font-size: 0.875rem;
   }
 
   #messages {
@@ -993,6 +1083,10 @@ canvas.cat-canvas {
 }
 
 @media screen and (max-width: 768px) {
+  :root {
+    --gallery-gutter: 16px;
+  }
+
   #main-bg img[alt^='bg-plant'] {
     min-width: 140px;
   }
@@ -1099,16 +1193,26 @@ canvas.cat-canvas {
   }
 
   #ending h1 {
-    font-size: 2.5rem;
-    margin-bottom: 0.875rem;
+    font-size: 2.25rem;
+    margin: 0.875rem 0;
   }
   #ending h2 {
-    font-size: 1.25rem;
-    margin-bottom: 1.125rem;
+    font-size: 0.875rem;
   }
 }
 
 @media screen and (max-width: 576px) {
+  :root {
+    --gallery-gutter: 10px;
+  }
+  #gallery .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  #gallery .grid .switched {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+  }
+
   #main-bg img[alt^='bg-plant'] {
     min-width: 120px;
   }
@@ -1139,7 +1243,7 @@ canvas.cat-canvas {
     padding: 17.5%;
   }
 
-  #time-loc .content {
+  #time-loc .content > div:first-child {
     max-width: 90vw;
   }
   #time-loc .content img[alt='chandelier'] {
@@ -1185,13 +1289,17 @@ canvas.cat-canvas {
     font-size: 0.75rem;
   }
 
+  #ending .content {
+    max-width: 80vw;
+  }
   #ending h1 {
-    font-size: 2.25rem;
-    margin-bottom: 0.875rem;
+    font-size: 2rem;
+    margin: 2.5rem 0 0.5rem 0;
   }
   #ending h2 {
-    font-size: 1.125rem;
+    font-size: 0.875rem;
     margin-bottom: 1.125rem;
+    padding: 0 1.25rem;
   }
 }
 
@@ -1268,7 +1376,7 @@ canvas.cat-canvas {
     padding: 0.5rem 0.75rem;
   }
 
-    #ending h1 {
+  #ending h1 {
     font-size: 2rem;
     margin-bottom: 0.875rem;
   }
@@ -1353,6 +1461,7 @@ canvas.cat-canvas {
   }
   #intro .couple-img {
     max-width: 80vh;
+    max-width: 80svh;
   }
 
   #groom-bride .content {

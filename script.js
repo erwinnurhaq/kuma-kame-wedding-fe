@@ -14,6 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // const API_URL = `http://localhost:3000`;
   const API_URL = `https://v-kumakamewedding-api.erwww.in`;
 
+  function viewportWidth() {
+    return document.documentElement.clientWidth;
+  }
+
+  function viewportHeight() {
+    return document.documentElement.clientHeight;
+  }
+
   /* ---------------------------
      Event Date & Time Formatting
   --------------------------- */
@@ -73,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `/images/couple.webp`,
     `/images/groom.webp`,
     `/images/sepiring-nusantara.webp`,
+    ...new Array(8).fill('').map((_, idx) => `/images/gallery${idx + 1}.webp`),
   ];
   const CAT_FRAME_COUNT = 10;
   const CAT_IMAGES_PATHS = Array.from(
@@ -129,6 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------------------------
      Horizontal Scroll
   --------------------------- */
+
   function setupHorizontalScroll(onScrollUpdateCb) {
     const panelSection = document.querySelector('#panels');
     const panelContainer = document.querySelector('#panels-container');
@@ -249,6 +259,116 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ---------------------------
+     Gallery Animation
+  --------------------------- */
+
+  let galleryTL; // keep reference
+
+  function buildGalleryAnimation() {
+    if (galleryTL) {
+      galleryTL.scrollTrigger.kill();
+      galleryTL.kill();
+    }
+
+    function center(el) {
+      const r = el.getBoundingClientRect();
+      return {
+        x: r.left + r.width / 2 + window.scrollX,
+        y: r.top + r.height / 2 + window.scrollY,
+      };
+    }
+
+    const rootStyles = window.getComputedStyle(document.documentElement);
+    const galleryGutter = rootStyles.getPropertyValue('--gallery-gutter')?.replace('px', '');
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+    const MOVE_FACTOR = isMobile ? 0.3 : 0.5;
+    const MIN_SCALE = 0;
+    const SCRUB_VAL = 1;
+    const FEATURED_GUTTER = galleryGutter ? parseInt(galleryGutter, 10) : 32;
+
+    const contentContainer = document.querySelector(`#gallery .content`);
+    const feature = document.querySelector('.featured img');
+    const items = gsap.utils.toArray('.grid > div:not(.featured)');
+
+    if (!feature) return;
+
+    const featureOrigin = center(feature);
+    // const contentRect = contentContainer.getBoundingClientRect();
+
+    const itemData = items.map((el) => ({ el, center: center(el) }));
+    const maxDist = Math.max(
+      ...itemData.map((d) => Math.hypot(d.center.x - featureOrigin.x, d.center.y - featureOrigin.y))
+    );
+
+    galleryTL = gsap.timeline({
+      scrollTrigger: {
+        trigger: contentContainer,
+        start: 'bottom bottom-=10%', // "bottom of element hits bottom of viewport"
+        endTrigger: '#gallery',
+        end: 'bottom bottom', // "bottom of container hits bottom of viewport"
+        pin: contentContainer,
+        pinSpacing: false,
+        pinType: 'fixed',
+        invalidateOnRefresh: true,
+        scrub: SCRUB_VAL,
+        // markers: true,
+      },
+    });
+
+    galleryTL
+      .set(feature, {
+        width: '100%',
+        height: '100%',
+        maxWidth: '100%',
+        maxHeight: '100%',
+        x: 0,
+        y: 0,
+      })
+      .to(
+        feature,
+        {
+          // width: () => contentRect.width - FEATURED_GUTTER,
+          width: () => viewportWidth() - FEATURED_GUTTER,
+          height: () => viewportHeight() - FEATURED_GUTTER,
+          maxWidth: 'none',
+          maxHeight: 'none',
+          x: () => {
+            const r = feature.getBoundingClientRect();
+            // return -(r.left - contentRect.left - FEATURED_GUTTER / 2);
+            return -(r.left - FEATURED_GUTTER / 2);
+          },
+          y: () => {
+            const r = feature.getBoundingClientRect();
+            return -(r.top - FEATURED_GUTTER / 2);
+          },
+          borderRadius: `2.5rem`,
+          objectPosition: `top center`,
+          ease: 'power1.inOut',
+        },
+        0
+      );
+
+    itemData.forEach(({ el, center }) => {
+      const dist = Math.hypot(center.x - featureOrigin.x, center.y - featureOrigin.y);
+
+      const t = dist / maxDist;
+
+      galleryTL.to(
+        el,
+        {
+          scale: gsap.utils.interpolate(0.9, MIN_SCALE, t),
+          opacity: 0,
+          x: (featureOrigin.x - center.x) * MOVE_FACTOR,
+          y: (featureOrigin.y - center.y) * MOVE_FACTOR,
+          ease: 'power3.inOut',
+        },
+        gsap.utils.interpolate(0.15, 0, t)
+      );
+    });
+  }
+
+  /* ---------------------------
      Other Animation
   --------------------------- */
 
@@ -258,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
         opacity: 0,
         y: 80,
         duration: 0.8,
-        ease: 'power2.out',
+        ease: 'power2.inOut',
         scrollTrigger: {
           trigger: el,
           start: 'center-=20% bottom',
@@ -267,12 +387,24 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
+    gsap.from('#ending .ending-top-wrapper', {
+      opacity: 0,
+      y: 80,
+      duration: 0.8,
+      ease: 'power2.inOut',
+      scrollTrigger: {
+        trigger: '#ending .ending-top-wrapper',
+        start: 'top top+=20%',
+        toggleActions: 'play none none reverse',
+      },
+    });
+
     gsap.utils.toArray(['#groom-bride__bride', '#groom-bride__groom']).forEach((el) => {
       gsap.from(el, {
         opacity: 0,
         y: 80,
         duration: 0.8,
-        ease: 'power2.out',
+        ease: 'power2.inOut',
         scrollTrigger: {
           trigger: el,
           containerAnimation: horizontalTween,
@@ -287,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
         opacity: 0,
         y: -80,
         duration: 0.8,
-        ease: 'power2.out',
+        ease: 'power2.inOut',
         scrollTrigger: {
           trigger: el,
           containerAnimation: horizontalTween,
@@ -300,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
     gsap.to(`#bird-canvas`, {
       autoAlpha: 0,
       duration: 0.4,
-      ease: 'power2.out',
+      ease: 'power2.inOut',
       scrollTrigger: {
         trigger: `#bird-canvas`,
         start: 'top+=25% top',
@@ -508,15 +640,20 @@ document.addEventListener('DOMContentLoaded', () => {
     await preloadAllAssets();
     setTimeout(() => {
       mainLoading.hidden = true;
+      // handleMainIntroEnter();
     }, 700);
     mainIntroEnterBtn.addEventListener('click', handleMainIntroEnter);
-    // handleMainIntroEnter();
     updateDateTimeElements();
     updateCountdownElements();
     setupReservationForm();
+
     const { updateCatOnScroll } = setupCatAnimation();
     const { horizontalTween } = setupHorizontalScroll(updateCatOnScroll);
     setupOtherAnimations(horizontalTween);
+
+    buildGalleryAnimation();
+    ScrollTrigger.addEventListener('refreshInit', buildGalleryAnimation); // Rebuild on resize / orientation change
+
     loadMessages();
   }
 
