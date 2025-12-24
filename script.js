@@ -6,10 +6,17 @@ document.addEventListener('DOMContentLoaded', () => {
   /* ---------------------------
      Lib Initialization & Contants
   --------------------------- */
+  document.body.classList.add('no-scroll');
   const notyf = new Notyf({ position: { x: 'center', y: 'top' } });
   const DPI = Math.min(window.devicePixelRatio || 1, 2);
   gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-  document.body.classList.add('no-scroll');
+  ScrollTrigger.config({ ignoreMobileResize: true });
+  // ScrollTrigger.normalizeScroll({
+  //   normalize: true,
+  //     allowNestedScroll: true,
+  //     lockAxis: false,
+  //     momentum: self => Math.min(3, self.velocityY / 1000), // dynamically control the duration of the momentum when flick-scrolling
+  // })
 
   // const API_URL = `http://localhost:3000`;
   const API_URL = `https://v-kumakamewedding-api.erwww.in`;
@@ -67,6 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
      Assets
   --------------------------- */
 
+  const BGM_PATHS = ['/bgm/bgm.mp3', '/bgm/bgm-alt.mp3'];
   const MAIN_IMAGES_PATHS = [
     `/images/bg-intro-overlay.webp`,
     `/images/bg-intro.webp`,
@@ -88,17 +96,18 @@ document.addEventListener('DOMContentLoaded', () => {
     { length: CAT_FRAME_COUNT },
     (_, i) => `/images/cat_walking_frames_transparent_bg/frame_${String(i + 1).padStart(4, '0')}.webp`
   );
-  const TOTAL_IMAGES = MAIN_IMAGES_PATHS.length + CAT_IMAGES_PATHS.length;
+  const TOTAL_LOAD_ASSET = BGM_PATHS.length + MAIN_IMAGES_PATHS.length + CAT_IMAGES_PATHS.length;
   const CAT_IMAGES = [];
+  const BGM_AUDIOS = [];
 
   let loaded = 0;
 
-  function preloadImages(src, total, onProgress) {
+  function preloadImages(src, totalAsset, onProgress) {
     return new Promise((resolve, reject) => {
       const img = new Image();
       img.onload = () => {
         loaded++;
-        onProgress(loaded / total);
+        onProgress(loaded / totalAsset);
         resolve(img);
       };
       img.onerror = reject;
@@ -106,12 +115,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  function preloadAudio(src, vol, totalAsset, onProgress) {
+    return new Promise((resolve, reject) => {
+      const audio = new Audio();
+      audio.src = src;
+      audio.preload = 'auto';
+      audio.volume = vol;
+      audio.loop = true;
+      audio.onloadeddata = () => {
+        loaded++;
+        onProgress(loaded / totalAsset);
+        resolve(audio);
+      };
+    });
+  }
+
+  function audioSupport() {
+    const a = document.createElement('audio');
+    const mp3 = !!(a.canPlayType && a.canPlayType('audio/mpeg;').replace(/no/, ''));
+    if (mp3) return 'mp3';
+    return false;
+  }
   /* ---------------------------
      Intro Elements
   --------------------------- */
 
   const mainIntro = document.querySelector('#main-intro');
   const mainIntroEnterBtn = document.querySelector('#main-intro-enter-btn');
+  const mainIntroEnterBtn2 = document.querySelector('#main-intro-enter-btn2');
   const mainLoading = document.querySelector('#main-loading');
   const mainLoadingPercentage = document.querySelector('#main-loading-percentage');
 
@@ -120,19 +151,41 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function preloadAllAssets() {
-    const mapper = (src) => preloadImages(src, TOTAL_IMAGES, handleLoadingProgress);
+    // Audio
+    const isSupportAudio = audioSupport() === 'mp3';
+    const audios = await Promise.all(
+      BGM_PATHS.map((src) => {
+        if (isSupportAudio) {
+          return preloadAudio(src, 1, TOTAL_LOAD_ASSET, handleLoadingProgress);
+        }
+        loaded++;
+        onProgress(loaded / totalAsset);
+        return Promise.resolve();
+      })
+    );
+    BGM_AUDIOS.push(...audios);
+
+    // Images
+    const mapper = (src) => preloadImages(src, TOTAL_LOAD_ASSET, handleLoadingProgress);
     await Promise.all(MAIN_IMAGES_PATHS.map(mapper));
     const cats = await Promise.all(CAT_IMAGES_PATHS.map(mapper));
     CAT_IMAGES.push(...cats);
   }
 
-  function handleMainIntroEnter() {
+  function handleMainIntroEnter(audioIdx = 0, startAt = 0, volume = 1) {
     document.body.classList.remove('no-scroll');
     gsap.to(mainIntro, {
       y: `-100%`,
       duration: 0.8,
-      onComplete: setupAfterIntro,
+      onComplete: () => {
+        setupAfterIntro();
+      },
     });
+    if (BGM_AUDIOS.length > 0) {
+      BGM_AUDIOS[audioIdx].currentTime = startAt;
+      BGM_AUDIOS[audioIdx].volume = volume;
+      BGM_AUDIOS[audioIdx].play();
+    }
   }
 
   /* ---------------------------
@@ -307,9 +360,9 @@ document.addEventListener('DOMContentLoaded', () => {
         start: 'bottom bottom-=10%', // "bottom of element hits bottom of viewport"
         endTrigger: '#gallery',
         end: 'bottom bottom', // "bottom of container hits bottom of viewport"
-        pin: contentContainer,
+        pin: true,
         pinSpacing: false,
-        pinType: 'fixed',
+        // pinType: 'fixed',
         invalidateOnRefresh: true,
         scrub: SCRUB_VAL,
         // markers: true,
@@ -638,11 +691,6 @@ document.addEventListener('DOMContentLoaded', () => {
   async function start() {
     setupMainLoadingGifAnimation();
     await preloadAllAssets();
-    setTimeout(() => {
-      mainLoading.hidden = true;
-      // handleMainIntroEnter();
-    }, 700);
-    mainIntroEnterBtn.addEventListener('click', handleMainIntroEnter);
     updateDateTimeElements();
     updateCountdownElements();
     setupReservationForm();
@@ -655,6 +703,12 @@ document.addEventListener('DOMContentLoaded', () => {
     ScrollTrigger.addEventListener('refreshInit', buildGalleryAnimation); // Rebuild on resize / orientation change
 
     loadMessages();
+    setTimeout(() => {
+      mainLoading.hidden = true;
+      // handleMainIntroEnter();
+    }, 700);
+    mainIntroEnterBtn.addEventListener('click', () => handleMainIntroEnter(0, 10, 0.8));
+    mainIntroEnterBtn2.addEventListener('click', () => handleMainIntroEnter(1, 0, 0.8));
   }
 
   start();
