@@ -13,7 +13,8 @@ $(function () {
   gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
   ScrollTrigger.config({ ignoreMobileResize: true });
 
-  const API_URL = `http://localhost:3000`;
+  // const API_URL = `http://localhost:3000`;
+  const API_URL = `https://v-kumakamewedding-api.erwww.in`;
 
   const viewportWidth = () => document.documentElement.clientWidth;
   const viewportHeight = () => document.documentElement.clientHeight;
@@ -61,7 +62,7 @@ $(function () {
   /* ---------------------------
       Assets Preloading
   --------------------------- */
-  const BGM_PATHS = ['/bgm/bgm.mp3', '/bgm/bgm-alt.mp3'];
+  const BGM_PATHS = ['/bgm/bgm.mp3'];
   const MAIN_IMAGES_PATHS = [
     `/images/bg-intro-overlay.webp`,
     `/images/bg-intro.webp`,
@@ -74,9 +75,10 @@ $(function () {
     `/images/bride.webp`,
     `/images/chandelier.webp`,
     `/images/couple.webp`,
+    `/images/ending.webp`,
     `/images/groom.webp`,
     `/images/sepiring-nusantara.webp`,
-    ...new Array(8).fill('').map((_, idx) => `/images/gallery${idx + 1}.webp`),
+    ...new Array(10).fill('').map((_, idx) => `/images/photobook${idx + 1}.webp`),
   ];
 
   const CAT_FRAME_COUNT = 10;
@@ -226,6 +228,34 @@ $(function () {
   }
 
   /* ---------------------------
+     Bird Animation
+  --------------------------- */
+
+  function setupBirdAnimation() {
+    VANTA.BIRDS({
+      el: '#bird-canvas',
+      mouseControls: false,
+      touchControls: false,
+      gyroControls: false,
+      minHeight: 400.0,
+      minWidth: 400.0,
+      scale: 1.0,
+      scaleMobile: 1.0,
+      backgroundColor: 0xffffff,
+      color1: 0x747474,
+      color2: 0xd4d4d4,
+      colorMode: 'lerp',
+      birdSize: 1,
+      speedLimit: 3.0,
+      separation: 81.0,
+      alignment: 19.0,
+      cohesion: 19.0,
+      quantity: 1.0,
+      backgroundAlpha: 0.0,
+    });
+  }
+
+  /* ---------------------------
      Other Animation
   --------------------------- */
   function setupOtherAnimations(horizontalTween) {
@@ -243,15 +273,29 @@ $(function () {
       });
     });
 
+    gsap.from('#ending .ending-img', {
+      yPercent: -100,
+      ease: 'power1.in',
+      scrollTrigger: {
+        trigger: '#ending',
+        start: 'top bottom',
+        end: 'bottom bottom',
+        scrub: 1,
+        invalidateOnRefresh: true,
+      },
+    });
+
     gsap.from('#ending .ending-top-wrapper', {
       opacity: 0,
-      y: 80,
+      yPercent: -80,
       duration: 0.8,
-      ease: 'power2.inOut',
+      ease: 'power2.in',
       scrollTrigger: {
-        trigger: '#ending .ending-top-wrapper',
-        start: 'top top+=20%',
-        toggleActions: 'play none none reverse',
+        trigger: '#ending',
+        start: 'top bottom+=20%',
+        end: 'bottom bottom',
+        scrub: 1,
+        invalidateOnRefresh: true,
       },
     });
 
@@ -425,9 +469,10 @@ $(function () {
     loadMessages();
 
     $('#main-intro-enter-btn').on('click', () => handleMainIntroEnter(0, 10, 0.8));
-    $('#main-intro-enter-btn2').on('click', () => handleMainIntroEnter(1, 0, 0.8));
 
     setTimeout(() => $('#main-loading').attr('hidden', true), 700);
+
+    $('#flipbook').turn({ acceleration: true });
   }
 
   start();
