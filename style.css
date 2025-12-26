@@ -960,6 +960,7 @@ canvas.cat-canvas {
   max-width: 1280px;
   margin: 0 auto;
   padding: 3rem 2rem;
+  overflow: hidden;
 }
 #photobook .photobook-hero {
   padding: 1rem;

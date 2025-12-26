@@ -3,6 +3,45 @@ $(window).on('beforeunload', function () {
 });
 
 $(function () {
+  async function faroLoad() {
+    return new Promise((resolve) => {
+      var webSdkScript = document.createElement('script');
+
+      // fetch the latest 2.x.x version of the Web-SDK from the CDN
+      webSdkScript.src = 'https://unpkg.com/@grafana/faro-web-sdk@2/dist/bundle/faro-web-sdk.iife.js';
+
+      webSdkScript.onload = () => {
+        window.faro = window.GrafanaFaroWebSdk.initializeFaro({
+          url: 'https://faro-collector-prod-ap-southeast-2.grafana.net/collect/c06ee3e19e811f3b546cad4620b357d1',
+          app: {
+            name: 'kumakamewedding',
+            version: '1.0.0',
+            environment: 'production',
+          },
+        });
+
+        // Load instrumentations at the onLoad event of the web-SDK and after the above configuration.
+        // This is important because we need to ensure that the Web-SDK has been loaded and initialized before we add further instruments!
+        var webTracingScript = document.createElement('script');
+
+        // fetch the latest 2.x.x version of the Web Tracing package from the CDN
+        webTracingScript.src = 'https://unpkg.com/@grafana/faro-web-tracing@2/dist/bundle/faro-web-tracing.iife.js';
+
+        // Initialize, configure (if necessary) and add the the new instrumentation to the already loaded and configured Web-SDK.
+        webTracingScript.onload = () => {
+          window.GrafanaFaroWebSdk.faro.instrumentations.add(new window.GrafanaFaroWebTracing.TracingInstrumentation());
+          resolve();
+        };
+
+        // Append the Web Tracing script script tag to the HTML page
+        document.head.appendChild(webTracingScript);
+      };
+
+      // Append the Web-SDK script script tag to the HTML page
+      document.head.appendChild(webSdkScript);
+    });
+  }
+
   /* ---------------------------
       Lib Initialization & Constants
   --------------------------- */
@@ -16,8 +55,22 @@ $(function () {
   // const API_URL = `http://localhost:3000`;
   const API_URL = `https://v-kumakamewedding-api.erwww.in`;
 
-  const viewportWidth = () => document.documentElement.clientWidth;
-  const viewportHeight = () => document.documentElement.clientHeight;
+  function checkOS() {
+    const os = 'Unknown OS';
+    if (typeof window === `undefined` || typeof navigator === `undefined`) return os;
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    if (userAgent.indexOf('win') != -1) return 'Windows';
+    else if (/iPhone|iPad|iPod/i.test(userAgent || navigator.vendor)) return 'iOS';
+    else if (userAgent.indexOf('mac') != -1) return 'MacOS';
+    else if (userAgent.indexOf('android') != -1) return 'Android';
+    else if (userAgent.indexOf('linux') != -1) return 'Linux';
+    else if (userAgent.indexOf('x11') != -1) return 'UNIX';
+    return os;
+  }
+
+  const os = checkOS();
+  const canPlayType = new Audio().canPlayType?.('audio/mpeg;');
+  const isSupportAudio = !!canPlayType.replace(/no/, '');
 
   /* ---------------------------
       Event Date & Time Formatting
@@ -116,23 +169,45 @@ $(function () {
       audio.preload = 'auto';
       audio.volume = vol;
       audio.loop = true;
-      audio.onloadeddata = () => {
+      audio.onerror = reject;
+      if (os === 'iOS' || canPlayType === 'maybe') {
         onAssetProgress();
         resolve(audio);
-      };
-      audio.onerror = reject;
+        faro.api.pushEvent('preload skipped');
+      } else {
+        audio.onloadeddata = () => {
+          onAssetProgress();
+          resolve(audio);
+          faro.api.pushEvent('preload done');
+        };
+      }
     });
   }
 
   async function preloadAllAssets() {
-    const isSupportAudio = !!new Audio().canPlayType('audio/mpeg;').replace(/no/, '');
+    faro.api.pushEvent('isSupportAudio', { os, canPlayType, isSupportAudio });
 
-    const audios = await Promise.all(BGM_PATHS.map((src) => (isSupportAudio ? preloadAudio(src, 1) : (onAssetProgress(), Promise.resolve()))));
-    BGM_AUDIOS.push(...audios);
+    try {
+      const audios = await Promise.all(
+        BGM_PATHS.map((src) => {
+          if (isSupportAudio) {
+            return preloadAudio(src, 1);
+          } else {
+            onAssetProgress();
+            return Promise.resolve();
+          }
+        })
+      );
+      faro.api.pushEvent('Audios loaded: ', { count: audios.length });
+      BGM_AUDIOS.push(...audios);
 
-    await Promise.all(MAIN_IMAGES_PATHS.map(preloadImages));
-    const cats = await Promise.all(CAT_IMAGES_PATHS.map(preloadImages));
-    CAT_IMAGES.push(...cats);
+      await Promise.all(MAIN_IMAGES_PATHS.map(preloadImages));
+      const cats = await Promise.all(CAT_IMAGES_PATHS.map(preloadImages));
+      CAT_IMAGES.push(...cats);
+    } catch (err) {
+      notyf.error(err?.message || 'error')
+      faro.api.pushError(err);
+    }
   }
 
   /* ---------------------------
@@ -150,6 +225,7 @@ $(function () {
       BGM_AUDIOS[audioIdx].currentTime = startAt;
       BGM_AUDIOS[audioIdx].volume = volume;
       BGM_AUDIOS[audioIdx].play();
+      faro.api.pushEvent('playAudio', { audioIdx, startAt, volume });
     }
   }
 
@@ -447,6 +523,8 @@ $(function () {
       Main Bootstrapper
   --------------------------- */
   async function start() {
+    await faroLoad();
+    faro.api.pushEvent('>> updateDateTimeElements');
     updateDateTimeElements();
 
     // Initial GSAP loading animation
@@ -456,23 +534,36 @@ $(function () {
       ease: 'power2.in',
     });
 
+    
+    faro.api.pushEvent('>> preloadAllAssets');
     await preloadAllAssets();
 
+    faro.api.pushEvent('>> setupCatAnimation');
     const { updateCatOnScroll } = setupCatAnimation();
+    faro.api.pushEvent('>> setupHorizontalScroll');
     const { horizontalTween } = setupHorizontalScroll(updateCatOnScroll);
 
     // Inject horizontalTween into other GSAP animations needed
+    faro.api.pushEvent('>> setupOtherAnimations');
     setupOtherAnimations(horizontalTween);
 
+    faro.api.pushEvent('>> updateCountdown');
     updateCountdown();
+    faro.api.pushEvent('>> setupReservationForm');
     setupReservationForm();
+    faro.api.pushEvent('>> loadMessages');
     loadMessages();
 
     $('#main-intro-enter-btn').on('click', () => handleMainIntroEnter(0, 10, 0.8));
 
-    setTimeout(() => $('#main-loading').attr('hidden', true), 700);
+    setTimeout(() => {
+      $('#main-loading').attr('hidden', true);
+      faro.api.pushEvent('>> main-loading hidden');
+    }, 700);
 
+    faro.api.pushEvent('>> flipbook init');
     $('#flipbook').turn({ acceleration: true });
+    faro.api.pushEvent('>> FINISH');
   }
 
   start();
