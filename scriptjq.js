@@ -3,6 +3,9 @@ $(window).on('beforeunload', function () {
 });
 
 $(function () {
+  /* ---------------------------
+      Monitoring
+  --------------------------- */
   async function faroLoad() {
     return new Promise((resolve) => {
       var webSdkScript = document.createElement('script');
@@ -43,17 +46,11 @@ $(function () {
   }
 
   /* ---------------------------
-      Lib Initialization & Constants
+      Lib Initialization, Utils & Constants
   --------------------------- */
-  $('body').addClass('no-scroll');
-  const notyf = new Notyf({ position: { x: 'center', y: 'top' } });
-  const DPI = Math.min(window.devicePixelRatio || 1, 2);
-
-  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-  ScrollTrigger.config({ ignoreMobileResize: true });
-
-  // const API_URL = `http://localhost:3000`;
-  const API_URL = `https://v-kumakamewedding-api.erwww.in`;
+  function sanitize(string) {
+    return DOMPurify.sanitize(string, { USE_PROFILES: { html: true } });
+  }
 
   function checkOS() {
     const os = 'Unknown OS';
@@ -68,6 +65,14 @@ $(function () {
     return os;
   }
 
+  $('body').addClass('no-scroll');
+  gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
+  // const API_URL = `http://localhost:3000`;
+  const API_URL = `https://v-kumakamewedding-api.erwww.in`;
+  const DPI = Math.min(window.devicePixelRatio || 1, 2);
+  const notyf = new Notyf({ position: { x: 'center', y: 'top' } });
   const os = checkOS();
   const canPlayType = new Audio().canPlayType?.('audio/mpeg;');
   const isSupportAudio = !!canPlayType.replace(/no/, '');
@@ -205,7 +210,7 @@ $(function () {
       const cats = await Promise.all(CAT_IMAGES_PATHS.map(preloadImages));
       CAT_IMAGES.push(...cats);
     } catch (err) {
-      notyf.error(err?.message || 'error')
+      notyf.error(err?.message || 'error');
       faro.api.pushError(err);
     }
   }
@@ -493,10 +498,10 @@ $(function () {
       $submitBtn.prop('disabled', true);
 
       const payload = {
-        name: this.name.value,
+        name: sanitize(this.name.value),
         attendance: $('#attd_attendance').val() || 'no',
         totalGuests: $('#attd_attendance').val() === 'no' ? 0 : parseInt(this.guests.value) || 1,
-        message: this.message.value,
+        message: sanitize(this.message.value),
       };
 
       $.ajax({
@@ -523,10 +528,6 @@ $(function () {
       Main Bootstrapper
   --------------------------- */
   async function start() {
-    await faroLoad();
-    faro.api.pushEvent('>> updateDateTimeElements');
-    updateDateTimeElements();
-
     // Initial GSAP loading animation
     gsap.from('#main-loading img', {
       height: 0,
@@ -534,7 +535,10 @@ $(function () {
       ease: 'power2.in',
     });
 
-    
+    await faroLoad();
+    faro.api.pushEvent('>> updateDateTimeElements');
+    updateDateTimeElements();
+
     faro.api.pushEvent('>> preloadAllAssets');
     await preloadAllAssets();
 
@@ -559,7 +563,7 @@ $(function () {
     setTimeout(() => {
       $('#main-loading').attr('hidden', true);
       faro.api.pushEvent('>> main-loading hidden');
-    }, 700);
+    }, 500);
 
     faro.api.pushEvent('>> flipbook init');
     $('#flipbook').turn({ acceleration: true });
