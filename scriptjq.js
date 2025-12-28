@@ -76,6 +76,16 @@ $(function () {
   const os = checkOS();
   const canPlayType = new Audio().canPlayType?.('audio/mpeg;');
   const isSupportAudio = !!canPlayType.replace(/no/, '');
+  let guestName;
+
+  /* ---------------------------
+      Guest Info
+  --------------------------- */
+  function updateGuestInfo() {
+    const params = new URLSearchParams(window.location.search);
+    guestName = sanitize(params.get('to') || 'Guest');
+    $(`[data-guest-name]`).html(guestName);
+  }
 
   /* ---------------------------
       Event Date & Time Formatting
@@ -499,8 +509,8 @@ $(function () {
 
       const payload = {
         name: sanitize(this.name.value),
-        attendance: $('#attd_attendance').val() || 'no',
-        totalGuests: $('#attd_attendance').val() === 'no' ? 0 : parseInt(this.guests.value) || 1,
+        attendance: this.attendance.value || 'no',
+        totalGuests: !this.attendance.value || this.attendance.value === 'no' ? 0 : parseInt(this.guests.value, 10) || 1,
         message: sanitize(this.message.value),
       };
 
@@ -522,6 +532,7 @@ $(function () {
 
     $('.btn-prev').on('click', () => loadMessages(currentPagination.page - 1, focusMessagesSection));
     $('.btn-next').on('click', () => loadMessages(currentPagination.page + 1, focusMessagesSection));
+    if (guestName) $('#attd_name').prop('defaultValue', guestName);
   }
 
   /* ---------------------------
@@ -538,6 +549,8 @@ $(function () {
     await faroLoad();
     faro.api.pushEvent('>> updateDateTimeElements');
     updateDateTimeElements();
+    faro.api.pushEvent('>> updateGuestInfo');
+    updateGuestInfo();
 
     faro.api.pushEvent('>> preloadAllAssets');
     await preloadAllAssets();
