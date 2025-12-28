@@ -76,15 +76,15 @@ $(function () {
   const os = checkOS();
   const canPlayType = new Audio().canPlayType?.('audio/mpeg;');
   const isSupportAudio = !!canPlayType.replace(/no/, '');
-  let guestName;
+  let guestName = '';
 
   /* ---------------------------
       Guest Info
   --------------------------- */
   function updateGuestInfo() {
     const params = new URLSearchParams(window.location.search);
-    guestName = sanitize(params.get('to') || 'Guest');
-    $(`[data-guest-name]`).html(guestName);
+    guestName = sanitize(params.get('to'));
+    if (guestName) $(`[data-guest-name]`).html(guestName);
   }
 
   /* ---------------------------
