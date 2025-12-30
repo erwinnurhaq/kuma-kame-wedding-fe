@@ -476,12 +476,12 @@ $(function () {
             )
             .join('');
 
-          $('.message-list').html(items);
+          $('[data-message-list]').html(items);
 
           currentPagination = pagination;
           $('.btn-prev').prop('disabled', !pagination.hasPrev);
           $('.btn-next').prop('disabled', !pagination.hasNext);
-          $('.message-pagination-info').html(`Page ${pagination.page} of ${pagination.totalPages}`);
+          $('[data-message-pagination-info]').html(`Page ${pagination.page} of ${pagination.totalPages}`);
           cb?.();
         }
       })
