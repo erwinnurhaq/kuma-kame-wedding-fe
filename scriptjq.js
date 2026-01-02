@@ -76,6 +76,7 @@ $(function () {
   const os = checkOS();
   const canPlayType = new Audio().canPlayType?.('audio/mpeg;');
   const isSupportAudio = !!canPlayType.replace(/no/, '');
+  let type = '';
   let guestName = '';
 
   /* ---------------------------
@@ -83,6 +84,7 @@ $(function () {
   --------------------------- */
   function updateGuestInfo() {
     const params = new URLSearchParams(window.location.search);
+    type = sanitize(params.get('type'))
     guestName = sanitize(params.get('to'));
     if (guestName) $(`[data-guest-name]`).html(guestName);
   }
@@ -532,7 +534,7 @@ $(function () {
 
     $('.btn-prev').on('click', () => loadMessages(currentPagination.page - 1, focusMessagesSection));
     $('.btn-next').on('click', () => loadMessages(currentPagination.page + 1, focusMessagesSection));
-    if (guestName) $('#attd_name').prop('defaultValue', guestName);
+    if (guestName && type !== 'group') $('#attd_name').prop('defaultValue', guestName);
   }
 
   /* ---------------------------
