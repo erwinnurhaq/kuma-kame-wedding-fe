@@ -84,7 +84,7 @@ $(function () {
   --------------------------- */
   function updateGuestInfo() {
     const params = new URLSearchParams(window.location.search);
-    type = sanitize(params.get('type'))
+    type = sanitize(params.get('type'));
     guestName = sanitize(params.get('to'));
     if (guestName) $(`[data-guest-name]`).html(guestName);
   }
@@ -506,6 +506,10 @@ $(function () {
 
     $form.on('submit', function (e) {
       e.preventDefault();
+      if (!this.attendance.value) {
+        return notyf.error('Please confirm your attendance');
+      }
+
       const $submitBtn = $('.submit-btn');
       $submitBtn.prop('disabled', true);
 
@@ -515,6 +519,10 @@ $(function () {
         totalGuests: !this.attendance.value || this.attendance.value === 'no' ? 0 : parseInt(this.guests.value, 10) || 1,
         message: sanitize(this.message.value),
       };
+
+      if (guestName && type === 'group') {
+        payload.name = `[${guestName}] ${payload.name}`;
+      }
 
       $.ajax({
         url: `${API_URL}/api/attendance`,
