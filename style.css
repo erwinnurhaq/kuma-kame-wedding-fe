@@ -711,6 +711,12 @@ img {
 #messages .message-item p[data-name] {
   font-weight: bold;
   word-break: break-all;
+  span {
+    font-size: 0.75rem;
+    font-weight: normal;
+    font-style: italic;
+    color: var(--dark-grey-accent-1);
+  }
 }
 #messages .message-item p[data-message] {
   word-break: break-all;

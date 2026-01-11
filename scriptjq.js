@@ -453,6 +453,28 @@ $(function () {
   --------------------------- */
   let currentPagination = { page: 1, totalPages: 1 };
 
+  // Handle name with group prefix [groupname]
+  function splitBracketPrefix(str) {
+    if (!str || str[0] !== '[') return [null, str];
+
+    let depth = 0;
+    for (let i = 0; i < str.length; i++) {
+      if (str[i] === '[') depth++;
+      else if (str[i] === ']') depth--;
+
+      // Found the matching closing bracket
+      if (depth === 0) {
+        return [str.slice(0, i + 1), str.slice(i + 1).trimStart()];
+      }
+    }
+    return [null, str];
+  }
+
+  function formatAttendanceName(value) {
+    const [groupName, name] = splitBracketPrefix(value);
+    return `${name}${groupName ? `<br/><span>${groupName}</span>` : ''}`;
+  }
+
   function focusMessagesSection() {
     $('#messages')[0].scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
@@ -471,7 +493,7 @@ $(function () {
             .map(
               (i) => `
             <div class="message-item">
-              <p data-name>${i.name}</p>
+              <p data-name>${formatAttendanceName(i.name)}</p>
               <p data-message>${i.message || '-'}</p>
               <p data-date>${formatTimestamp(i.updatedAt)}</p>
             </div>`
